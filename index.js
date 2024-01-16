@@ -179,7 +179,7 @@ function versionConfig() {
         exit();
         break;
       default:
-        version = a.versionOption;
+        version = a.versionConfig;
         launc();
         break;
     }
