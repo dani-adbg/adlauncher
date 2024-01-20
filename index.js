@@ -4,8 +4,7 @@ const PCuser = require('os').userInfo().username;
 const launcher = new Client();
 // MENU
 const fs = require('fs');
-// const root = `C:/Users/${PCuser}/AppData/Roaming/.minecraft`;
-const root = './minecraft';
+const root = `C:/Users/${PCuser}/AppData/Roaming/.minecraft`;
 const logs = `${root}/logs/latest.log`;
 const inquirer = require('inquirer');
 // FORGE
