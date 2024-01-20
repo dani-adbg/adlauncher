@@ -7,8 +7,62 @@ const fs = require('fs');
 const root = `C:/Users/${PCuser}/AppData/Roaming/.minecraft`;
 const logs = `${root}/logs/latest.log`;
 const inquirer = require('inquirer');
+// FORGE
+const axios = require('axios');
 
-let user, version, data;
+let user, version, data, type;
+
+const exist = (ruta) => {
+  try {
+    return fs.statSync(ruta).isDirectory();
+  } catch (error) {
+    return false;
+  }
+};
+
+if(!exist(root)) fs.mkdirSync(root);
+if(!exist(root+'/adlauncher')) fs.mkdirSync(root+'/adlauncher');
+if(!exist(root+'/adlauncher/forgedown')) fs.mkdirSync(root+'/adlauncher/forgedown');
+if(!fs.existsSync(root+'/launcher_profiles.json')) createProfile();
+
+function createProfile() {
+  const profile = {
+    selectedAccountUUID:"c1eab8bf180f11eda78bf02f74958c02",
+    clientToken:"2788918e-eb1d-42f3-927a-94f7c8deada8",
+    profiles:{
+      "fabric-loader-1.20.1":{
+        lastUsed:"2023-11-09T19:12:58+0300",
+        lastVersionId:"fabric-loader-0.14.24-1.20.1",
+        created:"2023-11-09T19:12:58+0300",
+        name:"fabric-loader-1.20.1",
+        icon:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACABAMAAAAxEHz4AAAAGFBMVEUAAAA4NCrb0LTGvKW8spyAem2uppSakn5SsnMLAAAAAXRSTlMAQObYZgAAAJ5JREFUaIHt1MENgCAMRmFWYAVXcAVXcAVXcH3bhCYNkYjcKO8dSf7v1JASUWdZAlgb0PEmDSMAYYBdGkYApgf8ER3SbwRgesAf0BACMD1gB6S9IbkEEBfwY49oNj4lgLhA64C0o9R9RABTAvp4SX5kB2TA5y8EEAK4pRrxB9QcA4QBWkj3GCAMUCO/xwBhAI/kEsCagCHDY4AwAC3VA6t4zTAMj0OJAAAAAElFTkSuQmCC",
+        type:"custom"
+      }
+    },
+    accounts:{
+      c1eab8bf180f11eda78bf02f74958c02:{
+        skinType:"tlauncher",
+        displayName:"dani_adbg",
+        profiles:[{
+          name:"dani_adbg",
+          id:"c1eab8bf-180f-11ed-a78b-f02f74958c02"
+        }],accessToken:"4befb45d-d6fe-44a5-a0f0-2585758ccbb9",
+        type:"tlauncher",
+        userID:"dani_adbg",
+        uuid:"c1eab8bf-180f-11ed-a78b-f02f74958c02",
+        selectedProfile:{
+          name:"dani_adbg",
+          id:"c1eab8bf-180f-11ed-a78b-f02f74958c02"
+        },
+        username:"dani_adbg",
+        premiumAccount:false
+      }
+    },
+    freeAccountUUID:"2f24d9c7e7fd48a281afba68e3907cfb"
+  }
+  
+  fs.writeFileSync(`${root}/launcher_profiles.json`, JSON.stringify(profile));
+}
 
 function getData() {
   // Obtener el último usuario
@@ -21,17 +75,6 @@ function getData() {
     }, fechas[0]);
   } catch (error) {
     return userConfig();
-  }
-
-  // Obtener la última versión
-  try {
-    const archivoStream = fs.readFileSync(logs, 'utf-8');
-    const regex = /Starting integrated minecraft server version (\d+\.\d+)/;
-    const matches = archivoStream.match(regex);
-    version = matches[0].split(' ');
-    version = version[version.length - 1];
-  } catch (error) {
-    return versionConfig();
   }
 
   // Ejecutar el menu principal
@@ -52,11 +95,11 @@ function menu() {
       },
       {
         value: '2',
-        name: `User: ${user.name}`
+        name: `User: ${user.name !== undefined ? user.name : user}`
       },
       {
         value: '3',
-        name: `Version: ${version}`
+        name: `Version: ${version !== undefined ? version : 'Selecciona la version'}`
       },
       {
         value: '4',
@@ -77,7 +120,7 @@ function menu() {
         userConfig();
         break;
       case '3':
-        versionConfig();
+        versionType();
         break;
       case '4':
         exit();
@@ -147,12 +190,52 @@ function newUser() {
   })
 }
 
+function versionType() {
+  console.clear();
+  console.log('CONFIGURACION DE VERSIONES');
+  const optionsVersions = [{
+    type: 'list',
+    name: 'versionType',
+    message: 'Escoge una opcion de version',
+    choices: [
+      {
+        name: 'vanilla'
+      },
+      {
+        name: 'forge'
+      },
+      {
+        name: 'Salir'
+      }
+    ]
+  }];
+  inquirer.prompt(optionsVersions).then(a => {
+    switch (a.versionType) {
+      case 'Salir':
+        exit();
+        break;
+      default:
+        type = a.versionType;
+        versionConfig();
+        break;
+    }
+  })
+}
+
 function versionConfig() {
   let files;
-  try {
-    files = fs.readdirSync(root + '/versions');
-  } catch (error) {
-    files = [];
+  if (type === 'vanilla') {
+    try {
+      files = fs.readdirSync(root + '/versions');
+    } catch (error) {
+      files = [];
+    }
+  } else if(type === 'forge') {
+    try {
+      files = fs.readdirSync(root + '/adlauncher/forgedown');
+    } catch (error) {
+      files = [];
+    }
   }
   console.clear();
   console.log('CONFIGURACION DE VERSIONES');
@@ -179,12 +262,21 @@ function versionConfig() {
         exit();
         break;
       default:
-        version = a.versionConfig;
+        let aversion = a.versionConfig;
+        let match;
+        if(type === 'forge') {
+          match = aversion.match(/-(d+\.\d+\.\d+)/) || aversion.match(/-(d+\.\d+)/);
+        } else {
+          match = aversion.match(/(d+\.\d+\.\d+)/) || aversion.match(/(d+\.\d+)/);
+        }
+        version = match[1];
         launc();
         break;
     }
   })
 }
+
+let url, downRoot;
 
 function newVersion() {
   console.clear();
@@ -206,7 +298,38 @@ function newVersion() {
 
   inquirer.prompt(nVersion).then(a => {
     version = a.version;
-    launc();
+
+    if(type === 'forge') {
+      url = `https://files.minecraftforge.net/net/minecraftforge/forge/index_${version}.html`;
+      downRoot = `${root}/adlauncher/forgedown/forge-${version}.jar`;
+      try {
+        axios.get(url).then(async a => {
+          const match = a.data.match(/<a href="([^"]+installer\.jar)">/);
+          if(match && match[1]) {
+            let downloadLink = match[1];
+            if(downloadLink.includes('url='))
+              downloadLink = downloadLink.split('url=').pop();
+            const forgeResponse = await axios.get(downloadLink, {
+              responseType: 'stream'
+            });
+            const writer = fs.createWriteStream(downRoot, { encoding: 'utf-8' });
+            forgeResponse.data.pipe(writer);
+            await new Promise((resolve, reject) => {
+              writer.on('finish', resolve);
+              writer.on('error', reject);
+            }).then(() => {
+              launc();
+            })
+          } else {
+            throw new Error('No se ha encontrado el link del archivo JAR');
+          }
+        }).catch((e) => console.log(e));
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      launc();
+    }
   })
 }
 
@@ -218,29 +341,47 @@ function launc() {
   console.clear();
 
   if(user === undefined || user === null) {
-    userConfig();
+    menu();
   } else if(version === undefined || version === null) {
-    versionConfig();
+    menu();
   } else {
-    launch(user.name == undefined ? user : user.name, version);
+    let opts = {
+      root: root,
+      memory: {
+        max: "6G",
+        min: "4G"
+      }
+    };
+
+    const vTested = ['1.16.5', '1.17.1', '1.18', '1.18.1', '1.18.2'];
+    const vNew = ['1.19', '1.19.1', '1.19.2', '1.19.3', '1.19.4', '1.20', '1.20.1', '1.20.2', '1.20.3'];
+
+    if(type === 'vanilla') {
+      launch(user.name == undefined ? user : user.name, version, opts);
+    } else if(type === 'forge') {
+      let custom;
+      opts.forge = `${downRoot !== undefined ? downRoot : `${root}/adlauncher/forgedown/forge-${version}.jar`}`;
+      if(vTested.includes(version)) {
+        custom = `${version}-forge`;
+      };
+      launch(user.name == undefined ? user : user.name, version, opts, custom);
+    }
+
   }
 }
 
-function launch(name, version) {
-  let opts = {
-    authorization: Authenticator.getAuth(name),
-    root: root,
-    version: {
-      number: version,
-      type: "release"
-    },
-    memory: {
-      max: "6G",
-      min: "4G"
-    }
-  }
+function launch(name, version, options, custom) {
+  const optsVer = {
+    number: version,
+    type: 'release',
+    custom: custom
+  };
+
+  options.authorization = Authenticator.getAuth(name);
+  options.version = optsVer;
+  console.log(options);
   
-  launcher.launch(opts);
+  launcher.launch(options);
   
   launcher.on('debug', (e) => console.log(e));
   launcher.on('data', (e) => console.log(e));
