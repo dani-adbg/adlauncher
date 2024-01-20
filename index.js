@@ -4,7 +4,8 @@ const PCuser = require('os').userInfo().username;
 const launcher = new Client();
 // MENU
 const fs = require('fs');
-const root = `C:/Users/${PCuser}/AppData/Roaming/.minecraft`;
+// const root = `C:/Users/${PCuser}/AppData/Roaming/.minecraft`;
+const root = './minecraft';
 const logs = `${root}/logs/latest.log`;
 const inquirer = require('inquirer');
 // FORGE
@@ -262,14 +263,11 @@ function versionConfig() {
         exit();
         break;
       default:
-        let aversion = a.versionConfig;
-        let match;
+        version = a.versionConfig;
         if(type === 'forge') {
-          match = aversion.match(/-(d+\.\d+\.\d+)/) || aversion.match(/-(d+\.\d+)/);
-        } else {
-          match = aversion.match(/(d+\.\d+\.\d+)/) || aversion.match(/(d+\.\d+)/);
+          const match = version.match(/\d+\.\d+(\.\d+)?/) 
+          version = match[0];
         }
-        version = match[1];
         launc();
         break;
     }
