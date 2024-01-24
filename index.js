@@ -4,14 +4,14 @@ const PCuser = require('os').userInfo().username;
 const launcher = new Client();
 // MENU
 const fs = require('fs');
-// const root = `C:/Users/${PCuser}/AppData/Roaming/.minecraft`;
-const root = './minecraft';
-const logs = `${root}/logs/latest.log`;
+const root = `C:/Users/${PCuser}/AppData/Roaming/.minecraft`;
 const inquirer = require('inquirer');
 // FORGE
 const axios = require('axios');
 
-let user, version, data, type;
+let user, version, data, url, downRoot;
+const vTested = ['1.16.5', '1.17.1', '1.18', '1.18.1', '1.18.2'];
+const vNew = ['1.19', '1.19.1', '1.19.2', '1.19.3', '1.19.4', '1.20', '1.20.1', '1.20.2', '1.20.3'];
 
 const exist = (ruta) => {
   try {
@@ -115,13 +115,13 @@ function menu() {
   inquirer.prompt(optionsMenu).then(a => {
     switch (a.option) {
       case '1':
-        launc();
+        version !== undefined ? verifyLaunch() : menu();
         break;
       case '2':
         userConfig();
         break;
       case '3':
-        versionType();
+        versions();
         break;
       case '4':
         exit();
@@ -161,7 +161,7 @@ function userConfig() {
         break;
       default:
         user = a.userOption;
-        launc();
+        menu();
         break;
     }
   })
@@ -187,63 +187,26 @@ function newUser() {
 
   inquirer.prompt(nUser).then(a => {
     user = a.username;
-    launc();
+    menu();
   })
 }
 
-function versionType() {
-  console.clear();
-  console.log('CONFIGURACION DE VERSIONES');
-  const optionsVersions = [{
-    type: 'list',
-    name: 'versionType',
-    message: 'Escoge una opcion de version',
-    choices: [
-      {
-        name: 'vanilla'
-      },
-      {
-        name: 'forge'
-      },
-      {
-        name: 'Salir'
-      }
-    ]
-  }];
-  inquirer.prompt(optionsVersions).then(a => {
-    switch (a.versionType) {
-      case 'Salir':
-        exit();
-        break;
-      default:
-        type = a.versionType;
-        versionConfig();
-        break;
-    }
-  })
-}
-
-function versionConfig() {
-  let files;
-  if (type === 'vanilla') {
-    try {
-      files = fs.readdirSync(root + '/versions');
-    } catch (error) {
-      files = [];
-    }
-  } else if(type === 'forge') {
-    try {
-      files = fs.readdirSync(root + '/adlauncher/forgedown');
-    } catch (error) {
-      files = [];
-    }
+function versions() {
+  let files = [];
+  try {
+    files = fs.readdirSync(`${root}/versions`);
+  } catch(error) {
+    files = [];
   }
+  fs.readdirSync(`${root}/adlauncher/forgedown`).forEach(element => {
+    files.push(element);
+  });
   console.clear();
-  console.log('CONFIGURACION DE VERSIONES');
+  console.log("CONFIGURACION DE VERSIONES");
   const optionsVersions = [{
     type: 'list',
     name: 'versionConfig',
-    message: 'Escoge una opcion de version',
+    message: 'Escoge una opción de versión',
     choices: [
       {
         name: 'Descargar version'
@@ -255,7 +218,8 @@ function versionConfig() {
     ]
   }];
   inquirer.prompt(optionsVersions).then(a => {
-    switch (a.versionConfig) {
+    let option = a.versionConfig;
+    switch (option) {
       case 'Descargar version':
         newVersion();
         break;
@@ -263,18 +227,12 @@ function versionConfig() {
         exit();
         break;
       default:
-        version = a.versionConfig;
-        if(type === 'forge') {
-          const match = version.match(/\d+\.\d+(\.\d+)?/) 
-          version = match[0];
-        }
-        launc();
+        version = option;
+        menu();
         break;
     }
   })
 }
-
-let url, downRoot;
 
 function newVersion() {
   console.clear();
@@ -297,10 +255,12 @@ function newVersion() {
   inquirer.prompt(nVersion).then(a => {
     version = a.version;
 
-    if(type === 'forge') {
-      url = `https://files.minecraftforge.net/net/minecraftforge/forge/index_${version}.html`;
-      downRoot = `${root}/adlauncher/forgedown/forge-${version}.jar`;
-      try {
+    if(version.startsWith('forge-')) {
+      const dVersion = version.split('forge-').pop();
+      if(vTested.includes(dVersion) || vNew.includes(dVersion)) {
+        url = `https://files.minecraftforge.net/net/minecraftforge/forge/index_${dVersion}.html`;
+        downRoot = `${root}/adlauncher/forgedown/forge-${dVersion}.jar`;
+        
         axios.get(url).then(async a => {
           const match = a.data.match(/<a href="([^"]+installer\.jar)">/);
           if(match && match[1]) {
@@ -316,17 +276,21 @@ function newVersion() {
               writer.on('finish', resolve);
               writer.on('error', reject);
             }).then(() => {
-              launc();
+              menu();
             })
           } else {
             throw new Error('No se ha encontrado el link del archivo JAR');
           }
         }).catch((e) => console.log(e));
-      } catch (error) {
-        console.log(error);
+      } else {
+        console.log(`La versión ${dVersion} no está en la lista de versiones testeadas.`);
+        console.log("Regresando a MENU DE OPCIONES");
+        setTimeout(() => {
+          versions();
+        }, 2000);
       }
     } else {
-      launc();
+      menu();
     }
   })
 }
@@ -335,52 +299,53 @@ function exit() {
   process.exit(0);
 }
 
-function launc() {
-  console.clear();
-
-  if(user === undefined || user === null) {
-    menu();
-  } else if(version === undefined || version === null) {
-    menu();
-  } else {
-    let opts = {
+function verifyLaunch() {
+  const name = user.name == undefined ? user : user.name;
+  let custom, opts;
+  if(version.startsWith('forge-')) {
+    custom = version.replace(/\.jar$/, '');
+    version = version.match(/-(\d+(\.\d+)*)(\.jar)?/)[1];
+    downRoot = `${downRoot !== undefined ? downRoot : `${root}/adlauncher/forgedown/forge-${version}.jar`}`;
+    opts = {
+      authorization: Authenticator.getAuth(name),
       root: root,
+      version: {
+        number: version,
+        type: "release"
+      },
+      forge: downRoot,
       memory: {
         max: "6G",
         min: "4G"
       }
-    };
-
-    const vTested = ['1.16.5', '1.17.1', '1.18', '1.18.1', '1.18.2'];
-    const vNew = ['1.19', '1.19.1', '1.19.2', '1.19.3', '1.19.4', '1.20', '1.20.1', '1.20.2', '1.20.3'];
-
-    if(type === 'vanilla') {
-      launch(user.name == undefined ? user : user.name, version, opts);
-    } else if(type === 'forge') {
-      let custom;
-      opts.forge = `${downRoot !== undefined ? downRoot : `${root}/adlauncher/forgedown/forge-${version}.jar`}`;
-      if(vTested.includes(version)) {
-        custom = `${version}-forge`;
-      };
-      launch(user.name == undefined ? user : user.name, version, opts, custom);
     }
-
+    vTested.includes(version) ? opts.version.custom = custom : null;
+    launch(opts);
+  } else {
+    opts = {
+      authorization: Authenticator.getAuth(name),
+      root: root,
+      version: {
+        number: version,
+        type: "release"
+      },
+      memory: {
+        max: "6G",
+        min: "4G"
+      }
+    }
+    if(version.length > 6) {
+      const match = version.match(/(\d+\.\d+(?:\.\d+)*)(-(?:[A-Za-z0-9]+_?)+)/);
+      opts.version.number = match[1];
+      const custom = match.input;
+      opts.version.custom = custom;
+    }
+    launch(opts);
   }
 }
 
-function launch(name, version, options, custom) {
-  const optsVer = {
-    number: version,
-    type: 'release',
-    custom: custom
-  };
-
-  options.authorization = Authenticator.getAuth(name);
-  options.version = optsVer;
-  console.log(options);
-  
+function launch(options) {
   launcher.launch(options);
-  
   launcher.on('debug', (e) => console.log(e));
   launcher.on('data', (e) => console.log(e));
 }
