@@ -335,7 +335,7 @@ function verifyLaunch() {
       }
     }
     if(version.length > 6) {
-      const match = version.match(/fabric-loader-\d+\.\d+\.\d+-(\d+\.\d+\.\d+)/) || version.match(/(\d+\.\d+(?:\.\d+)*)(-(?:[A-Za-z0-9]+_?)+)/);
+      const match = version.match(/fabric-loader-\d+\.\d+\.\d+-(\d+\.\d+(\.\d+)?)$/) || version.match(/(\d+\.\d+(?:\.\d+)*)(-(?:[A-Za-z0-9]+_?)+)/);
       opts.version.number = match[1];
       const custom = match.input;
       opts.version.custom = custom;
