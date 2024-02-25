@@ -15,7 +15,7 @@
   display: grid;
   grid-template-columns: 20% repeat(2, 1fr);
   grid-template-rows: 10% repeat(3, auto);
-  gap: 20px;
+  gap: 4px;
 }
 
 #nav {
