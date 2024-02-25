@@ -4,25 +4,25 @@
 * {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
   color: #DFE0E1;
   font-family: "Anta", sans-serif;
 }
 
-.container { 
+.container {
   background-color: #222831;
   min-height: 100vh;
-  min-width: 100vh;
   display: grid;
-  grid-template-columns: 20% repeat(2, 40%);
-  grid-template-rows: 10% repeat(3, 30%);
+  grid-template-columns: 20% repeat(2, 1fr);
+  grid-template-rows: 10% repeat(3, auto);
+  gap: 20px;
 }
 
 #nav {
-  grid-column: 2 / 5;
+  grid-column: 2 / 4;
   grid-row: 1;
   display: flex;
-  flex-direction: column;
-  text-align: center;
+  align-items: center;
   justify-content: center;
   font-size: 4vh;
   font-weight: bold;
@@ -31,68 +31,79 @@
 #side-bar {
   background-color: #393E46;
   grid-column: 1;
-  grid-row: 1 / -1;
-  display: grid;
-  width: 100%;
+  grid-row: 1 / span 4;
 }
 
 .profile {
-  grid-row: 1;
-  grid-column: 1;
   display: flex;
   justify-content: space-around;
   align-items: center;
   height: 10vh;
-  width: 32vh;
   font-size: 3vh;
   transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 #profile {
-  max-height: 7vh;
-  max-width: 7vh;
+  height: 7vh;
+  width: 7vh;
   border-radius: 50%;
 }
 
 .side-bar-options {
-  height: 60vh;
   margin-top: 15vh;
   margin-left: 3vh;
-  grid-row: 1 / 4;
-  grid-column: 1;
   display: flex;
-  justify-content: space-between;
   flex-direction: column;
 }
 
 .side-bar-options > span {
   cursor: pointer;
-  height: 2vh;
   transition: color 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  margin-bottom: 17px; /* Espacio entre los botones */
 }
 
 .side-bar-footer {
-  grid-row: 4;
   text-align: center;
-} 
-
-.main {
-  grid-column: 2 / 5;
-  grid-row: 2 / 4;
 }
 
-@media screen and (min-width: 400px) and (max-width: 975px) {
-  .profile {
-    width: auto;
+.main {
+  grid-column: 2 / 4;
+  grid-row: 2 / 5;
+}
+
+/* Media Queries */
+@media screen and (max-width: 768px) {
+  .container {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+
+  #nav {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  #side-bar {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .main {
+    grid-column: 1;
+    grid-row: 3;
+  }
+
+  .side-bar-options {
+    margin-top: 5vh;
   }
 }
 
-/* ANIMACIONES MEJORADAS */
+/* Hover Animations */
 .profile:hover {
-  transform: scale(1.1) rotate(5deg); /* Escala y rota el perfil al hacer hover */
+  transform: scale(1.1) rotate(5deg);
 }
 
 .side-bar-options > span:hover {
-  color: #FFD369; /* Cambia el color del texto al hacer hover */
-  transform: translateY(-3px); /* Eleva ligeramente el elemento al hacer hover */
+  color: #FFD369;
+  transform: translateY(-3px);
 }
