@@ -1,0 +1,41 @@
+.settings {
+  height: 80vh;
+  margin: 7vh auto;
+  max-width: 80%;
+}
+
+.boxlabel {
+  margin: 2vh 0;
+}
+
+.box {
+  border: 1px solid #DFE0E1;
+  height: 7vh;
+  border-radius: 10px;
+}
+
+.memoriesboxex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.memorybox {
+  width: 25vh;
+  margin: 0 5vh;
+}
+
+.savesettings {
+  width: 100%;
+  text-align: center;
+}
+
+#save {
+  height: 7vh;
+  width: 15vh;
+  cursor: pointer;
+  border-radius: 20px;
+  border: none;
+  background-color: green;
+  font-weight: bold;
+}

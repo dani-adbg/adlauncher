@@ -1,0 +1,34 @@
+.img {
+  max-width: 100%;
+  height: 60vh;
+}
+
+#img {
+  width: 100%;
+  height: 60vh;
+}
+
+.main-bar {
+  background-color: #161a1e;
+  height: 10vh;
+  margin-top: -1vh;
+  padding: 1vh 2vh 0 2vh;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.version-selector {
+  margin-left: 2vh;
+  cursor: pointer;
+}
+
+#play {
+  height: 7vh;
+  width: 15vh;
+  cursor: pointer;
+  border-radius: 20px;
+  border: none;
+  background-color: green;
+  font-weight: bold;
+}

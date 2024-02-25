@@ -1,0 +1,46 @@
+{
+  "name": "adlauncher",
+  "version": "1.0.0",
+  "description": "Launcher de Minecraft creado con adlauncher-core y electron",
+  "main": "index.js",
+  "scripts": {
+    "dev": "electron .",
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dani-adbg/adlauncher.git"
+  },
+  "keywords": [
+    "adlauncher",
+    "minecraft",
+    "launcher",
+    "download",
+    "free",
+    "node",
+    "java"
+  ],
+  "author": "dani_adbg",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dani-adbg/adlauncher/issues"
+  },
+  "homepage": "https://github.com/dani-adbg/adlauncher#readme",
+  "devDependencies": {
+    "@electron-forge/cli": "^7.3.0",
+    "@electron-forge/maker-deb": "^7.3.0",
+    "@electron-forge/maker-rpm": "^7.3.0",
+    "@electron-forge/maker-squirrel": "^7.3.0",
+    "@electron-forge/maker-zip": "^7.3.0",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.3.0",
+    "@electron-forge/plugin-fuses": "^7.3.0",
+    "@electron/fuses": "^1.7.0",
+    "electron": "^29.0.1"
+  },
+  "dependencies": {
+    "adlauncher-core": "^1.0.1",
+    "electron-squirrel-startup": "^1.0.0"
+  }
+}
