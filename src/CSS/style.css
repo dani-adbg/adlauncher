@@ -45,6 +45,7 @@
   height: 10vh;
   width: 32vh;
   font-size: 3vh;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 #profile {
@@ -67,6 +68,7 @@
 .side-bar-options > span {
   cursor: pointer;
   height: 2vh;
+  transition: color 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .side-bar-footer {
@@ -83,4 +85,14 @@
   .profile {
     width: auto;
   }
+}
+
+/* ANIMACIONES MEJORADAS */
+.profile:hover {
+  transform: scale(1.1) rotate(5deg); /* Escala y rota el perfil al hacer hover */
+}
+
+.side-bar-options > span:hover {
+  color: #FFD369; /* Cambia el color del texto al hacer hover */
+  transform: translateY(-3px); /* Eleva ligeramente el elemento al hacer hover */
 }
