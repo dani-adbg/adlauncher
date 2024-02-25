@@ -10,6 +10,25 @@
   <script src="JS/renderer.js"></script>
 </head>
 <body>
+
+<!-- Dentro del body del HTML -->
+<div id="welcomeModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Bienvenido a ADLauncher</h2>
+    <p>¡Bienvenidos! Estamos aquí para ofrecerte una experiencia de juego increíble,
+       especialmente pensada para aquellos que quizás no pueden permitirse comprar el juego original. Sin embargo, es importante tener en cuenta que la piratería no está bien. Valoramos el arduo trabajo de los desarrolladores
+        y queremos apoyarlos para que puedan seguir creando los juegos que tanto disfrutamos. Por eso, mientras disfrutas de tu experiencia de juego con nosotros, recuerda siempre
+       apoyar a los desarrolladores comprando juegos originales. ¡Diviértete y juega con responsabilidad!
+    </p>
+    <br>
+    <br>
+    <a href="https://www.minecraft.net/es-es" class="buy-button">
+      Comprar Minecraft
+    </a>
+  </div>
+</div>
+
   <div class="container">
     <nav id="nav">
       <span id="nav-title">ADLauncher</span>
@@ -46,5 +65,24 @@
       </div>
     </div>
   </div>
+  
+  <script>
+    var modal = document.getElementById("welcomeModal");
+var closeBtn = document.getElementsByClassName("close")[0];
+
+window.onload = function() {
+  modal.style.display = "block";
+}
+
+closeBtn.onclick = function() {
+  modal.style.display = "none";
+}
+
+window.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+}
+  </script>
 </body>
 </html>
