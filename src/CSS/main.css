@@ -1,13 +1,18 @@
+/* BACKGROUND PICTURE 1 */
 .img {
   max-width: 100%;
   height: 60vh;
 }
+/* END */
 
+/* BACKGROUND PICTURE 2 */
 #img {
   width: 100%;
   height: 60vh;
 }
+/* END */
 
+/* MAIN BAR */
 .main-bar {
   background-color: #161a1e;
   height: 10vh;
@@ -17,18 +22,83 @@
   justify-content: space-between;
   align-items: center;
 }
+/* END */
 
+/* VERSION SELECT */
 .version-selector {
   margin-left: 2vh;
   cursor: pointer;
 }
+/* END */
 
+/* PLAY BUTTON */
 #play {
+  position: relative;
+  overflow: hidden;
   height: 7vh;
   width: 15vh;
   cursor: pointer;
-  border-radius: 20px;
   border: none;
-  background-color: green;
+  background-color: #4CAF50;
+  color: white;
   font-weight: bold;
+  text-transform: uppercase;
+  outline: none;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+
+#play::before {
+  content: 'Play';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.3s ease;
+}
+
+#play::after {
+  content: 'Click to Start';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+#play:hover::before {
+  opacity: 0;
+}
+
+#play:hover::after {
+  opacity: 1;
+}
+
+#play span {
+  position: relative;
+  z-index: 1;
+}
+
+#play:hover span {
+  animation: jitter 0.4s ease infinite alternate;
+}
+
+@keyframes jitter {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(3px);
+  }
+}
+
+#play:active::before {
+  background-color: #1B5E20;
+}
+
+#play:active::after {
+  opacity: 0;
+}
+/* END */
