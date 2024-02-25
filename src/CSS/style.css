@@ -28,6 +28,15 @@
   font-weight: bold;
 }
 
+#nav-title {
+  transition: transform 0.3s ease, opacity 0.3s ease; /* Transiciones suaves de escala y opacidad */
+}
+
+#nav:hover #nav-title {
+  transform: scale(1.05); /* Aumenta ligeramente el tamaño */
+  opacity: 0.8; /* Reduce ligeramente la opacidad */
+}
+
 #side-bar {
   background-color: #393E46;
   grid-column: 1;
@@ -59,7 +68,7 @@
 .side-bar-options > span {
   cursor: pointer;
   transition: color 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  margin-bottom: 17px; /* Espacio entre los botones */
+  margin-bottom: 20px; /* Espacio entre los botones */
 }
 
 .side-bar-footer {
