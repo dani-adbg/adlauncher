@@ -44,6 +44,12 @@
   cursor: pointer;
   border-radius: 20px;
   border: none;
-  background-color: green;
+  background-color: #4CAF50;
   font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Agregamos una transición para la transformación */
+}
+
+#save:hover {
+  background-color: #3eb63e; /* Cambiamos el color de fondo al pasar el cursor */
+  transform: scale(1.1); /* Cambiamos el tamaño al 110% al pasar el cursor */
 }

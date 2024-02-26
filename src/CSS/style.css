@@ -15,7 +15,7 @@
   display: grid;
   grid-template-columns: 20% repeat(2, 1fr);
   grid-template-rows: 10% repeat(3, auto);
-  gap: 20px;
+  gap: 4px;
 }
 
 #nav {
@@ -86,9 +86,15 @@
 
 .side-bar-options > span {
   cursor: pointer;
-  transition: color 0.5s cubic-bezier(0.175, 0.885, 0.52, 1.275);
+  transition: color 0.6s ease, transform 0.6s ease;
   margin-bottom: 50px; /* Espacio entre los botones */
 }
+
+.side-bar-options > span:hover {
+  color: #FFD369;
+  transform: translateY(-3px);
+}
+
 
 .side-bar-footer {
   text-align: center;
