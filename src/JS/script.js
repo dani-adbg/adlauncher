@@ -19,7 +19,7 @@ addEventListener('DOMContentLoaded', () => {
   
   $play.addEventListener('click', () => {
     if(!version || !user) {
-      alert('Selecciona una versión y un usuario');
+      alert('Select a version and user');
     } else {
       window.adlauncher.play(user, version);
     }
