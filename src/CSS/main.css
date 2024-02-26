@@ -1,13 +1,18 @@
+/* BACKGROUND PICTURE 1 */
 .img {
   max-width: 100%;
   height: 60vh;
 }
+/* END */
 
+/* BACKGROUND PICTURE 2 */
 #img {
   width: 100%;
   height: 60vh;
 }
+/* END */
 
+/* MAIN BAR */
 .main-bar {
   background-color: #161a1e;
   height: 10vh;
@@ -17,18 +22,177 @@
   justify-content: space-between;
   align-items: center;
 }
+/* END */
 
+/* VERSION SELECT */
 .version-selector {
   margin-left: 2vh;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+#versionSelector {
+  transition: transform 0.5s ease;
+}
+
+.rotate {
+  transform: rotate(-180deg);
+}
+
+.versions {
+  background-color: #161a1e;
+  max-height: 80vh;
+  padding: 0 2vh;
+  border-radius: 15px;
+  position: absolute;
+  left: 45%;
+  bottom: 5vh;
+}
+
+#version-text {
+  margin: 0 1vh;
+}
+
+.version {
+  margin: 1vh 0;
+}
+
+.version:hover {
+  color: gray;
+  cursor: pointer;
+}
+
+/* END */
+
+/* PLAY BUTTON */
 #play {
+  position: relative;
+  overflow: hidden;
   height: 7vh;
   width: 15vh;
   cursor: pointer;
-  border-radius: 20px;
   border: none;
-  background-color: green;
+  background-color: #4CAF50;
+  color: white;
   font-weight: bold;
+  text-transform: uppercase;
+  outline: none;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#play::before {
+  content: 'Play';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.3s ease;
+}
+
+#play::after {
+  content: 'Click to Start';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+#play:hover::before {
+  opacity: 0;
+}
+
+#play:hover::after {
+  opacity: 1;
+}
+
+#play span {
+  position: relative;
+  z-index: 1;
+}
+
+#play:hover span {
+  animation: jitter 0.4s ease infinite alternate;
+}
+
+@keyframes jitter {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(3px);
+  }
+}
+
+#play:active::before {
+  background-color: #1B5E20;
+}
+
+#play:active::after {
+  opacity: 0;
+}
+/* END */
+
+/* WELCOME MESSAGE */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background-color: #222831;
+  margin: 15% auto; /* Establece el margen superior e inferior en 15% y los laterales automáticamente para centrar */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 500px; /* Ancho máximo para el contenido */
+  text-align: center; /* Centra el texto dentro del modal */
+}
+
+.close {
+  color: #a3a3a3;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.buy-button {
+  background-color: #4CAF50; /* Color de fondo del botón de compra */
+  color: white; /* Color del texto */
+  padding: 10px 20px; /* Espaciado interno */
+  font-size: 16px;
+  text-decoration: none; /* Elimina el subrayado del enlace */
+  border-radius: 5px; /* Añade bordes redondeados */
+  border: none; /* Elimina el borde */
+  cursor: pointer;
+}
+
+.buy-button:hover {
+  background-color: #45a049; /* Cambia el color de fondo al pasar el ratón */
+}
+/* END */
+
+/* VERSION IMG */
+.version-img {
+  height: 5vh;
+  width: 5vh;
 }

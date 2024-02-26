@@ -7,6 +7,7 @@ const launcher = new Launcher();
 // MINECRAFT 
 const User = require('os').userInfo().username;
 let mainRoot = `M:/develop/minecraft/adlauncher-core/minecraft`;
+// let mainRoot = `C:/Users/DANI/AppData/Roaming/.minecraft`;
 
 let versions = [];
 try {
@@ -14,6 +15,22 @@ try {
 } catch(error) {
   versions = [];
 }
+
+let user, data, users;
+try {
+  data = fs.readFileSync(`${mainRoot}/usercache.JSON`, 'utf-8');
+  data = JSON.parse(data);
+  fechas = data.map(item  => ({ ...item, fecha: new Date(item.fecha) }));
+  user = fechas.reduce((fechaActual, fechaSiguiente) => {
+    return fechaSiguiente > fechaActual ? fechaSiguiente : fechaActual;
+  }, fechas[0]).name;
+} catch (error) {
+  return 'Steve';
+}
+
+users = data ? data.map(x => x.name) : [];
+
+let maxMem = '6G', minMem = '3G';
 
 function minecraftLaunch(username, version, memory) {
   const launcherOptions = {
@@ -40,9 +57,9 @@ const createWindow = () => {
       preload: path.join(__dirname, 'src', 'preload.js'),
     },
     // ESCONDE LA BARRA MENU
-    // autoHideMenuBar: true,
+    autoHideMenuBar: true,
     icon: path.join(__dirname, 'src', 'assets', 'icon.png'),
-    resizable: false
+    // resizable: false
     // frame: false
   });
   // ELIMINA LA BARRA
@@ -64,13 +81,33 @@ const createWindow = () => {
     }
   })
 
+  ipcMain.on('getImg', (event, version) => {
+    win.webContents.send('sendImg', version);
+  });
+
   ipcMain.on('getVersions', (event) => {
     win.webContents.send('sendVersions', versions);
-  })
-
-  ipcMain.on('play', (event, version) => {
-    minecraftLaunch('dani_adbg', '1.20.4-OptiFine_HD_U_I7_pre2', { max: '6G', min: '3G' });
   });
+
+  ipcMain.on('getUser', (event) => {
+    win.webContents.send('sendUser', user);
+  });
+
+  ipcMain.on('getUsers', (event) => {
+    win.webContents.send('sendUsers', users);
+  });
+
+  // ipcMain.on('createUser', (event) => {
+  //   win.webContents.send('createUser');
+  // });
+
+  ipcMain.on('play', (event, user, version) => {
+    minecraftLaunch(user, version, { max: '6G', min: '3G' });
+  });
+
+  ipcMain.on('getSettings', (event) => {
+    win.webContents.send('sendSettings', mainRoot, minMem, maxMem)
+  })
 
   win.loadFile(path.join(__dirname, 'src', 'index.html'));
 };

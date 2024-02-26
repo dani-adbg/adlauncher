@@ -10,6 +10,25 @@
   <script src="JS/script.js"></script>
 </head>
 <body>
+
+<!-- Dentro del body del HTML -->
+<div id="welcomeModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Bienvenido a ADLauncher</h2>
+    <p>¡Bienvenidos! Estamos aquí para ofrecerte una experiencia de juego increíble,
+       especialmente pensada para aquellos que quizás no pueden permitirse comprar el juego original. Sin embargo, es importante tener en cuenta que la piratería no está bien. Valoramos el arduo trabajo de los desarrolladores
+        y queremos apoyarlos para que puedan seguir creando los juegos que tanto disfrutamos. Por eso, mientras disfrutas de tu experiencia de juego con nosotros, recuerda siempre
+       apoyar a los desarrolladores comprando juegos originales. ¡Diviértete y juega con responsabilidad!
+    </p>
+    <br>
+    <br>
+    <a href="https://www.minecraft.net/es-es" class="buy-button">
+      Comprar Minecraft
+    </a>
+  </div>
+</div>
+
   <div class="container">
     <nav id="nav">
       <span id="nav-title">ADLauncher</span>
@@ -17,17 +36,22 @@
     <aside id="side-bar">
       <div class="profile">
         <img src="assets/profile.png" alt="profile-img" id="profile">
-        <span id="profile-user">dani_adbg</span>
+        <span id="profile-user">Steve</span>
       </div>
+      <div class="users"></div>
       <div class="side-bar-options">
         <span id="changelogs"><i class="fa-solid fa-book"></i> CHANGELOGS</span>
+        <span class="settings"><i class="fa-solid fa-gear"></i> SETTINGS</span>
+        <span class="help"><i class="fa-solid fa-question"></i> HELP</span>
         <span id="discord"><i class="fa-brands fa-discord"></i> DISCORD</span>
         <span id="yt"><i class="fa-brands fa-youtube"></i> YOUTUBE</span>
         <span id="github"><i class="fa-brands fa-github"></i> GITHUB</span>
         <span id="settings"><i class="fa-solid fa-gear"></i> SETTINGS</span>
       </div>
       <div class="side-bar-footer">
+        <h1>Contributors</h1>
         <span>Developed by: dani_adbg</span>
+        <span>Animations by: akit</span>
       </div>
     </aside>
     <div class="main">
@@ -36,10 +60,11 @@
       </div>
       <div class="main-bar">
         <div class="version-selector">
-          <span>Selecciona una Versión <i class="fa-solid fa-caret-down"></i></span>
-          <div class="versions"></div>
+          <img src="assets/icon.png" class="version-img">
+          <span id="version-text">Selecciona una Versión</span> <i id="versionSelector" class="fa-solid fa-caret-down"></i>
         </div>
-        <button id="play">JUGAR</button>
+        <div class="versions"></div>
+        <button id="play"></button>
       </div>
     </div>
   </div>

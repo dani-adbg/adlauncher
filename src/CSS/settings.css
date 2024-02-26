@@ -12,6 +12,12 @@
   border: 1px solid #DFE0E1;
   height: 7vh;
   border-radius: 10px;
+  display: flex;
+}
+
+.rootbox {
+  padding-left: 2vh;
+  align-items: center;
 }
 
 .memoriesboxex {
@@ -23,6 +29,8 @@
 .memorybox {
   width: 25vh;
   margin: 0 5vh;
+  justify-content: center;
+  align-items: center;
 }
 
 .savesettings {

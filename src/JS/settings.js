@@ -7,4 +7,6 @@ addEventListener('DOMContentLoaded', () => {
   $home.addEventListener('click', () => {
     document.location.href = '../index.html';
   });
+
+  window.adlauncher.getSettings();
 });
