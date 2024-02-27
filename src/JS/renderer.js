@@ -35,7 +35,6 @@ addEventListener('DOMContentLoaded', () => {
 
   function clickManager() {
     user = this.textContent;
-    console.log($userText)
     $userText.innerText = user;
     $users.classList.toggle('hidden');
     this.removeEventListener('click', clickManager);
@@ -45,7 +44,7 @@ addEventListener('DOMContentLoaded', () => {
     const $user = $$('.name');
     const $createUser = $('#create-user');
     $createUser.addEventListener('click', () => {
-      // window.prompt('Ingresa el nombre de usuario', 'asd');
+      window.adlauncher.input('user');
     });
     $user.forEach(element => {
       element.addEventListener('click', clickManager);

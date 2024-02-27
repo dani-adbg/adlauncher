@@ -50,13 +50,37 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  const rootBox = $('.rootbox');
+  const minBox = $('#min');
+  const maxBox = $('#max');
   ipcRenderer.on('sendSettings', (_event, mainRoot, minMem, maxMem) => {
-    $('.rootbox').innerText = mainRoot;
-    $('#min').innerText = minMem;
-    $('#max').innerText = maxMem;
+    rootBox.innerText = mainRoot;
+    minBox.innerText = minMem;
+    maxBox.innerText = maxMem;
   });
+
+  ipcRenderer.on('changeRoot', (_event, dir) => {
+    rootBox.innerText = dir;
+  });
+
+  ipcRenderer.on('changeMin', (_event, val) => {
+    minBox.innerText = val;
+  });
+
+  ipcRenderer.on('changeMax', (_event, val) => {
+    maxBox.innerText = val;
+  });
+
+  ipcRenderer.on('newUser', (event, user) => {
+    $('#profile-user').innerText = user;
+  });
+
+  ipcRenderer.on('newVersion', (event, user) => {
+    $('#version-text').innerText = user;
+  })
   
   contextBridge.exposeInMainWorld('adlauncher', {
+    // INDEX
     getVersions: () => ipcRenderer.send('getVersions'),
     play: (user, version) => ipcRenderer.send('play', user, version),
     redirect: (url) => ipcRenderer.send('redirect', url),
@@ -65,6 +89,9 @@ window.addEventListener('DOMContentLoaded', () => {
     getUsers: () => ipcRenderer.send('getUsers'),
     downloadVersion: () => ipcRenderer.send('downloadVersion'),
     // createUser: () => ipcRenderer.send('createUser'),
-    getSettings: () => ipcRenderer.send('getSettings')
+    getSettings: () => ipcRenderer.send('getSettings'),
+    // SETTINGS
+    changeRoot: () => ipcRenderer.send('changeRoot'),
+    input: (opt) => ipcRenderer.send('input', opt)
   });
 });

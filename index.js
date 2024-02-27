@@ -1,4 +1,5 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const prompt = require('electron-prompt');
 const path = require('path');
 const fs = require('fs');
 const { Launcher } = require('adlauncher-core');
@@ -6,31 +7,47 @@ const launcher = new Launcher();
 
 // MINECRAFT 
 const User = require('os').userInfo().username;
-let mainRoot = `M:/develop/minecraft/adlauncher-core/minecraft`;
-// let mainRoot = `C:/Users/DANI/AppData/Roaming/.minecraft`;
+const appRoot = `C:/Users/${User}/AppData/Roaming/adlauncher`;
+// let mainRoot = `M:/develop/minecraft/adlauncher-core/minecraft`;
+let mainRoot = `C:/Users/${User}/AppData/Roaming/.minecraft`;
 
+// CREA EL ARCHIVO DE CONFIGS
+if(!fs.existsSync(path.resolve(appRoot, 'configs', 'settings.json'))) {
+  fs.mkdirSync(path.resolve(appRoot, 'configs'), { recursive: true });
+  fs.writeFileSync(path.resolve(appRoot, 'configs', 'settings.json'), JSON.stringify({ gameDirectory: mainRoot, memory: { max: '6G', min: '3G'}, users: []}));
+};
+// LEE EL ARCHIVO DE CONFIGS
+let configFile, maxMem, minMem, user, data, users;
+function reloadConfigs() {
+  configFile = JSON.parse(fs.readFileSync(path.resolve(appRoot, 'configs', 'settings.json')));
+
+  // OBTIENE LA RUTA DEL JUEGO
+  mainRoot = configFile.gameDirectory;
+
+  // OBTIENE LAS MEMORIAS DECLARADAS
+  maxMem = configFile.memory.max;
+  minMem = configFile.memory.min;
+
+  // OBTIENE EL ULTIMO USER CONECTADO
+  try {
+    user = configFile.users[0];
+  } catch (error) {
+    user = 'Steve';
+  }
+
+  // OBTIENE LOS USUARIOS REGISTRADOS
+  users = configFile.users;
+}
+reloadConfigs();
+mainRoot = configFile.gameDirectory;
+
+// OBTIENE LAS VERSIONES DESCARGADAS
 let versions = [];
 try {
   versions = fs.readdirSync(`${mainRoot}/versions`);
 } catch(error) {
   versions = [];
-}
-
-let user, data, users;
-try {
-  data = fs.readFileSync(`${mainRoot}/usercache.JSON`, 'utf-8');
-  data = JSON.parse(data);
-  fechas = data.map(item  => ({ ...item, fecha: new Date(item.fecha) }));
-  user = fechas.reduce((fechaActual, fechaSiguiente) => {
-    return fechaSiguiente > fechaActual ? fechaSiguiente : fechaActual;
-  }, fechas[0]).name;
-} catch (error) {
-  return 'Steve';
-}
-
-users = data ? data.map(x => x.name) : [];
-
-let maxMem = '6G', minMem = '3G';
+};
 
 function minecraftLaunch(username, version, memory) {
   const launcherOptions = {
@@ -45,7 +62,6 @@ function minecraftLaunch(username, version, memory) {
   
   launcher.launch(launcherOptions);
 }
-
 
 // ELECTRON
 const createWindow = () => {
@@ -91,6 +107,12 @@ const createWindow = () => {
 
   ipcMain.on('getUser', (event) => {
     win.webContents.send('sendUser', user);
+    const indice = users.indexOf(user);
+    users.splice(indice, 1);
+    fs.writeFileSync(path.resolve(appRoot, 'configs', 'settings.json'), JSON.stringify(configFile));
+    users.unshift(user);
+    fs.writeFileSync(path.resolve(appRoot, 'configs', 'settings.json'), JSON.stringify(configFile));
+
   });
 
   ipcMain.on('getUsers', (event) => {
@@ -101,12 +123,94 @@ const createWindow = () => {
   //   win.webContents.send('createUser');
   // });
 
-  ipcMain.on('play', (event, user, version) => {
+  ipcMain.on('play', (event, user, version, ) => {
     minecraftLaunch(user, version, { max: '6G', min: '3G' });
   });
 
   ipcMain.on('getSettings', (event) => {
+    reloadConfigs();
     win.webContents.send('sendSettings', mainRoot, minMem, maxMem)
+  });
+
+  ipcMain.on('changeRoot', async (event) => {
+    const dir = await dialog.showOpenDialog({ properties: ['openDirectory']});
+    if(dir.filePaths.length !== 0) {
+      configFile.gameDirectory = dir.filePaths[0].replace(/\\/g, '/');
+
+      fs.writeFileSync(path.resolve(appRoot, 'configs', 'settings.json'), JSON.stringify(configFile));
+      
+      win.webContents.send('changeRoot', configFile.gameDirectory);
+    }
+  });
+
+  ipcMain.on('input', async (event, opt) => {
+    switch (opt) {
+      case 'min':
+        const min = await prompt({ 
+          title: 'Ingrese un número entero',
+          label: 'Valor:',
+          inputAttrs: {
+            type: 'number' 
+          },
+          type: 'input'
+        });
+        configFile.memory.min = min+'G';
+
+        fs.writeFileSync(path.resolve(appRoot, 'configs', 'settings.json'), JSON.stringify(configFile));
+
+        win.webContents.send('changeMin', min+'G');
+        break;
+    
+      case 'max':
+        const max = await prompt({ 
+          title: 'Ingrese un número entero',
+          label: 'Valor:',
+          inputAttrs: {
+            type: 'number' 
+          },
+          type: 'input'
+        });
+        configFile.memory.max = max+'G';
+
+        fs.writeFileSync(path.resolve(appRoot, 'configs', 'settings.json'), JSON.stringify(configFile));
+
+        win.webContents.send('changeMax', max+'G');
+        break;
+
+      case 'user':
+        const newUser = await prompt({
+          title: 'Ingrese el nuevo usuario',
+          label: 'Nombre de Usuario',
+          inputAttrs: {
+            type: 'text'
+          },
+          type: 'input'
+        });
+
+        if(!configFile.users.includes(newUser) || newUser.length === 0) {
+          configFile.users.push(newUser);
+          fs.writeFileSync(path.resolve(appRoot, 'configs', 'settings.json'), JSON.stringify(configFile));
+
+        }
+        
+        win.webContents.send('newUser', newUser);
+        break;
+
+      case 'version':
+        const newVersion = await prompt({
+          title: 'Ingrese la nueva version',
+          label: 'Version',
+          inputAttrs: {
+            type: 'text'
+          },
+          type: 'input'  
+        });
+
+        win.webContents.send('newVersion', newVersion);
+        break;
+      default:
+        break;
+    }
   })
 
   win.loadFile(path.join(__dirname, 'src', 'index.html'));

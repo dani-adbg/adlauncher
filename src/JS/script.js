@@ -53,7 +53,7 @@ addEventListener('DOMContentLoaded', () => {
     const $version = $$('.version');
     const $downloadVersion = $('#download-version');
     $downloadVersion.addEventListener('click', () => {
-      window.adlauncher.downloadVersion();
+      window.adlauncher.input('version');
     })
     $version.forEach(element => {
       element.addEventListener("click", manejarClic);
