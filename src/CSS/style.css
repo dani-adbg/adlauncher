@@ -87,7 +87,7 @@
 .side-bar-options > span {
   cursor: pointer;
   transition: color 0.3s ease, transform 0.3s ease;
-  margin-bottom: 50px; /* Espacio entre los botones */
+  margin-bottom: 30px; /* Espacio entre los botones */
 }
 
 .side-bar-options > span:hover {
