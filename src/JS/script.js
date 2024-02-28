@@ -6,8 +6,9 @@ addEventListener('DOMContentLoaded', () => {
   const $settings = $('#settings');
   const $versionSelector = $('.version-selector'); 
   const $versions = $('.versions');
-  const $versionsIcon = $('#versionSelector');
+  const $versionsIcon = $('#version-selector');
   const $versionText = $('#version-text');
+  const $userText = $('#profile-user');
 
   let version, user;
 
@@ -18,7 +19,8 @@ addEventListener('DOMContentLoaded', () => {
   });
   
   $play.addEventListener('click', () => {
-    if(!version || !user) {
+    user = $userText.textContent;
+    if(!version || version === 'Descargar Version' || !user) {
       alert('Select a version and user');
     } else {
       window.adlauncher.play(user, version);
@@ -36,7 +38,7 @@ addEventListener('DOMContentLoaded', () => {
     if(!$versions.classList.contains('hidden')) {
       setTimeout(() => {
         versionpar();
-      }, 1)
+      }, 10)
     }
   });
 
@@ -49,12 +51,18 @@ addEventListener('DOMContentLoaded', () => {
     this.removeEventListener('click', manejarClic);
   }
 
+  function plpl() {
+    window.adlauncher.input('version');
+    this.removeEventListener('click', plpl);
+  }
+
   function versionpar() {
+    if((window.innerHeight - $versions.getBoundingClientRect().bottom) < 38) {
+      $versions.style.bottom = '5vh'
+    }
     const $version = $$('.version');
     const $downloadVersion = $('#download-version');
-    $downloadVersion.addEventListener('click', () => {
-      window.adlauncher.input('version');
-    })
+    $downloadVersion.addEventListener('click', plpl);
     $version.forEach(element => {
       element.addEventListener("click", manejarClic);
     });

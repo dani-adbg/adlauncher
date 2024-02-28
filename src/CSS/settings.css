@@ -1,6 +1,7 @@
 .settings {
   height: 80vh;
-  margin: 7vh auto;
+  margin: 0 auto;
+  margin-top: 7vh;
   max-width: 80%;
 }
 
@@ -13,6 +14,7 @@
   height: 7vh;
   border-radius: 10px;
   display: flex;
+  cursor: pointer;
 }
 
 .rootbox {
@@ -52,4 +54,46 @@
 #save:hover {
   background-color: #3eb63e; /* Cambiamos el color de fondo al pasar el cursor */
   transform: scale(1.1); /* Cambiamos el tamaño al 110% al pasar el cursor */
+}
+
+#download-version, #create-user {
+  display: none;
+}
+
+.listbox {
+  padding-left: 2vh;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 2vh;
+}
+
+.selector {
+  cursor: pointer;
+  transition: transform 0.5s ease;
+}
+
+.users-list, .versions {
+  background-color: #161a1e;
+  border-radius: 15px;
+  position: absolute;
+  width: 90vh;
+  padding: 1vh 0;
+  max-height: 40vh;
+  overflow: auto;
+}
+
+.settings-name, .version {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 2vh;
+  margin: 1vh 0;
+}
+
+.delete {
+  cursor: pointer;
+  background-color: red;
+  width: 3vh;
+  height: 3vh;
+  border-radius: 5px;
+  text-align: center;
 }

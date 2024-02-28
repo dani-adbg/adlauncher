@@ -36,15 +36,18 @@ window.addEventListener('DOMContentLoaded', () => {
     $('#profile-user').innerText = user;
   })
 
-  ipcRenderer.on('sendUsers', (_event, users) => {
+  ipcRenderer.on('sendUsers', (_event, users, settings) => {
     let $users = $('.users');
+    if(settings === 'settings') {
+      $users = $('.users-list');
+    }
     users.unshift('Crear Usuario');
     if($users.children.length === 0) {
       users.forEach(element => {
         if(element === 'Crear Usuario') {
-          $users.innerHTML += `<div class='name' id='create-user'>${element}</div>`;
+          $users.innerHTML += `<div class='${settings === 'settings' ? 'settings-name' : 'name'}' id='create-user'>${element}</div>`;
         } else {
-          $users.innerHTML += `<div class='name'>${element}</div>`;
+          $users.innerHTML += `<div class='${settings === 'settings' ? 'settings-name' : 'name'}'>${element}</div>`;
         }
       })
     }
@@ -71,27 +74,43 @@ window.addEventListener('DOMContentLoaded', () => {
     maxBox.innerText = val;
   });
 
-  ipcRenderer.on('newUser', (event, user) => {
+  ipcRenderer.on('newUser', (event, user, repeated) => {
     $('#profile-user').innerText = user;
+    if(!repeated) {
+      $('.users').innerHTML += `<div class='name'>${user}</div>`
+    }
   });
 
-  ipcRenderer.on('newVersion', (event, user) => {
-    $('#version-text').innerText = user;
-  })
+  ipcRenderer.on('newVersion', (event, version) => {
+    if(version === 'ERROR') {
+      alert('Ingresa una versión válida.');
+    } else {
+      $('#version-text').innerText = version;
+    }
+  });
+
+  ipcRenderer.on('memoriesError', (event) => {
+    alert('No se pueden ajustar las memorias a esa cantidad');
+  });
+
+  ipcRenderer.on('succesSaveSettings', (event) => {
+    alert('Ajustes guardados correctamente');
+  });
   
   contextBridge.exposeInMainWorld('adlauncher', {
-    // INDEX
-    getVersions: () => ipcRenderer.send('getVersions'),
-    play: (user, version) => ipcRenderer.send('play', user, version),
+    // ALL
     redirect: (url) => ipcRenderer.send('redirect', url),
-    getImg: (version) => ipcRenderer.send('getImg', version),
     getUser: () => ipcRenderer.send('getUser'),
-    getUsers: () => ipcRenderer.send('getUsers'),
-    downloadVersion: () => ipcRenderer.send('downloadVersion'),
-    // createUser: () => ipcRenderer.send('createUser'),
+    getUsers: (settings) => ipcRenderer.send('getUsers', settings),
     getSettings: () => ipcRenderer.send('getSettings'),
+    // INDEX
+    play: (user, version) => ipcRenderer.send('play', user, version),
+    getVersions: () => ipcRenderer.send('getVersions'),
+    getImg: (version) => ipcRenderer.send('getImg', version),
     // SETTINGS
     changeRoot: () => ipcRenderer.send('changeRoot'),
-    input: (opt) => ipcRenderer.send('input', opt)
+    input: (opt) => ipcRenderer.send('input', opt),
+    saveSettings: (newRoot, newMin, newMax) => ipcRenderer.send('saveSettings', newRoot, newMin, newMax),
+    delete: (element, type) => ipcRenderer.send('delete', element, type)
   });
 });

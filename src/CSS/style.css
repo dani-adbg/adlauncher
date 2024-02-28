@@ -7,6 +7,8 @@
   box-sizing: border-box;
   color: #DFE0E1;
   font-family: "Anta", sans-serif;
+  cursor: default;
+  overflow: hidden;
 }
 
 .container {
@@ -15,7 +17,6 @@
   display: grid;
   grid-template-columns: 20% repeat(2, 1fr);
   grid-template-rows: 10% repeat(3, auto);
-  gap: 4px;
 }
 
 #nav {
@@ -29,12 +30,12 @@
 }
 
 #nav-title {
-  transition: transform 0.5s ease, opacity 0.5s ease; /* Transiciones suaves de escala y opacidad */
+  transition: transform 0.5s ease, opacity 0.5s ease;
 }
 
 #nav:hover #nav-title {
-  transform: scale(1.05); /* Aumenta ligeramente el tamaño */
-  opacity: 0.8; /* Reduce ligeramente la opacidad */
+  transform: scale(1.05); 
+  opacity: 0.8; 
 }
 
 #side-bar {
@@ -66,6 +67,7 @@
   position: absolute;
   left: 2.5vh;
   top: 10vh;
+  width: 23vh;
 }
 
 .name {
@@ -78,16 +80,17 @@
 }
 
 .side-bar-options {
-  margin-top: 15vh;
+  margin-top: 6vh;
   margin-left: 3vh;
   display: flex;
   flex-direction: column;
+  padding-top: 1vh;
 }
 
 .side-bar-options > span {
   cursor: pointer;
   transition: color 0.3s ease, transform 0.3s ease;
-  margin-bottom: 50px; /* Espacio entre los botones */
+  margin-bottom: 30px;
 }
 
 .side-bar-options > span:hover {
@@ -97,6 +100,7 @@
 
 
 .side-bar-footer {
+  margin: 5vh 0;
   text-align: center;
 }
 
@@ -106,7 +110,7 @@
 }
 
 /* Media Queries */
-@media screen and (max-width: 768px) {
+/* @media screen and (max-width: 768px) {
   .container {
     grid-template-columns: 1fr;
     grid-template-rows: auto;
@@ -130,7 +134,7 @@
   .side-bar-options {
     margin-top: 5vh;
   }
-}
+} */
 
 /* Hover Animations */
 .profile:hover {
@@ -154,17 +158,16 @@
 
 /* No sé qué hace, pero si lo dejo así, se mantiene la scrollbar como me gusta */
 ::-webkit-scrollbar-button:increment,::-webkit-scrollbar-button {
-  /* display: none; */
 } 
 ::-webkit-scrollbar-thumb {
   background-color: #666;
 }
 
-::-webkit-scrollbar-track {
-  border-radius: 10px;  
-  background-color: #333;
-}
-
+/* CLASE HIDDEN PARA OCULTAR ELEMENTOS */
 .hidden {
   display: none;
+}
+
+.rotate {
+  transform: rotate(-180deg);
 }

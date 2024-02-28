@@ -2,13 +2,15 @@ const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const prompt = require('electron-prompt');
 const path = require('path');
 const fs = require('fs');
-const { Launcher } = require('adlauncher-core');
+const fse = require('fs-extra');
+const { Launcher, Downloader } = require('adlauncher-core');
 const launcher = new Launcher();
+const downloader = new Downloader();
+const os = require('os');
 
 // MINECRAFT 
-const User = require('os').userInfo().username;
+const User = os.userInfo().username;
 const appRoot = `C:/Users/${User}/AppData/Roaming/adlauncher`;
-// let mainRoot = `M:/develop/minecraft/adlauncher-core/minecraft`;
 let mainRoot = `C:/Users/${User}/AppData/Roaming/.minecraft`;
 
 // CREA EL ARCHIVO DE CONFIGS
@@ -17,7 +19,7 @@ if(!fs.existsSync(path.resolve(appRoot, 'configs', 'settings.json'))) {
   fs.writeFileSync(path.resolve(appRoot, 'configs', 'settings.json'), JSON.stringify({ gameDirectory: mainRoot, memory: { max: '6G', min: '3G'}, users: []}));
 };
 // LEE EL ARCHIVO DE CONFIGS
-let configFile, maxMem, minMem, user, data, users;
+let configFile, maxMem, minMem, user, users, versions;
 function reloadConfigs() {
   configFile = JSON.parse(fs.readFileSync(path.resolve(appRoot, 'configs', 'settings.json')));
 
@@ -37,17 +39,17 @@ function reloadConfigs() {
 
   // OBTIENE LOS USUARIOS REGISTRADOS
   users = configFile.users;
+  mainRoot = configFile.gameDirectory;
+
+  // OBTIENE LAS VERSIONES DESCARGADAS
+  try {
+    versions = fs.readdirSync(`${mainRoot}/versions`);
+  } catch(error) {
+    versions = [];
+  };
 }
 reloadConfigs();
-mainRoot = configFile.gameDirectory;
 
-// OBTIENE LAS VERSIONES DESCARGADAS
-let versions = [];
-try {
-  versions = fs.readdirSync(`${mainRoot}/versions`);
-} catch(error) {
-  versions = [];
-};
 
 function minecraftLaunch(username, version, memory) {
   const launcherOptions = {
@@ -75,7 +77,7 @@ const createWindow = () => {
     // ESCONDE LA BARRA MENU
     autoHideMenuBar: true,
     icon: path.join(__dirname, 'src', 'assets', 'icon.png'),
-    // resizable: false
+    resizable: false,
     // frame: false
   });
   // ELIMINA LA BARRA
@@ -84,7 +86,7 @@ const createWindow = () => {
     const wi = new BrowserWindow({ parent: win });
     switch (uri) {
       case 'discord': 
-        wi.loadURL('https://discord.gg/a93w5NpBR9')
+        wi.loadURL('https://discord.gg/a93w5NpBR9');
         break;
       case 'yt': 
         wi.loadURL('https://www.youtube.com/@dani_adbg');
@@ -98,25 +100,23 @@ const createWindow = () => {
   })
 
   ipcMain.on('getImg', (event, version) => {
+    reloadConfigs();
     win.webContents.send('sendImg', version);
   });
 
   ipcMain.on('getVersions', (event) => {
+    reloadConfigs();
     win.webContents.send('sendVersions', versions);
   });
 
   ipcMain.on('getUser', (event) => {
+    reloadConfigs();
     win.webContents.send('sendUser', user);
-    const indice = users.indexOf(user);
-    users.splice(indice, 1);
-    fs.writeFileSync(path.resolve(appRoot, 'configs', 'settings.json'), JSON.stringify(configFile));
-    users.unshift(user);
-    fs.writeFileSync(path.resolve(appRoot, 'configs', 'settings.json'), JSON.stringify(configFile));
-
   });
 
-  ipcMain.on('getUsers', (event) => {
-    win.webContents.send('sendUsers', users);
+  ipcMain.on('getUsers', (event, settings) => {
+    reloadConfigs();
+    win.webContents.send('sendUsers', users, settings);
   });
 
   // ipcMain.on('createUser', (event) => {
@@ -124,6 +124,7 @@ const createWindow = () => {
   // });
 
   ipcMain.on('play', (event, user, version, ) => {
+    reloadConfigs();
     minecraftLaunch(user, version, { max: '6G', min: '3G' });
   });
 
@@ -133,17 +134,17 @@ const createWindow = () => {
   });
 
   ipcMain.on('changeRoot', async (event) => {
+    reloadConfigs();
     const dir = await dialog.showOpenDialog({ properties: ['openDirectory']});
     if(dir.filePaths.length !== 0) {
       configFile.gameDirectory = dir.filePaths[0].replace(/\\/g, '/');
-
-      fs.writeFileSync(path.resolve(appRoot, 'configs', 'settings.json'), JSON.stringify(configFile));
       
       win.webContents.send('changeRoot', configFile.gameDirectory);
     }
   });
 
   ipcMain.on('input', async (event, opt) => {
+    reloadConfigs();
     switch (opt) {
       case 'min':
         const min = await prompt({ 
@@ -155,8 +156,6 @@ const createWindow = () => {
           type: 'input'
         });
         configFile.memory.min = min+'G';
-
-        fs.writeFileSync(path.resolve(appRoot, 'configs', 'settings.json'), JSON.stringify(configFile));
 
         win.webContents.send('changeMin', min+'G');
         break;
@@ -172,8 +171,6 @@ const createWindow = () => {
         });
         configFile.memory.max = max+'G';
 
-        fs.writeFileSync(path.resolve(appRoot, 'configs', 'settings.json'), JSON.stringify(configFile));
-
         win.webContents.send('changeMax', max+'G');
         break;
 
@@ -187,13 +184,14 @@ const createWindow = () => {
           type: 'input'
         });
 
-        if(!configFile.users.includes(newUser) || newUser.length === 0) {
+        let repeated = true;
+        if(!configFile.users.includes(newUser) || newUser.length === 0 || newUser === null) {
           configFile.users.push(newUser);
           fs.writeFileSync(path.resolve(appRoot, 'configs', 'settings.json'), JSON.stringify(configFile));
-
+          repeated = false;
         }
-        
-        win.webContents.send('newUser', newUser);
+        win.webContents.send('newUser', newUser, repeated);
+        reloadConfigs();
         break;
 
       case 'version':
@@ -206,10 +204,37 @@ const createWindow = () => {
           type: 'input'  
         });
 
+        downloader.download(newVersion, mainRoot)
+
         win.webContents.send('newVersion', newVersion);
         break;
       default:
         break;
+    }
+  });
+
+  ipcMain.on('saveSettings', (event, newRoot, newMin, newMax) => {
+    configFile.gameDirectory = newRoot;
+    configFile.memory.min = newMin;
+    configFile.memory.max = newMax;
+    const availableMemory = Math.floor((os.totalmem() - os.freemem()) / 1073741824);
+    if(newMin >= newMax || newMax >= availableMemory) {
+      win.webContents.send('memoriesError');
+    } else {
+      win.webContents.send('succesSaveSettings');
+      fs.writeFileSync(path.resolve(appRoot, 'configs', 'settings.json'), JSON.stringify(configFile));
+      reloadConfigs();
+    }
+  });
+
+  ipcMain.on('delete', (event, element, type) => {
+    reloadConfigs();
+    if(type === 'version') {
+      fse.removeSync(path.resolve(mainRoot, 'versions', element));
+      fse.removeSync(path.resolve(mainRoot, 'natives', element));
+    } else {
+      configFile.users = configFile.users.filter(x => x !== element);
+      fs.writeFileSync(path.resolve(appRoot, 'configs', 'settings.json'), JSON.stringify(configFile));
     }
   })
 

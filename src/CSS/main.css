@@ -9,6 +9,7 @@
 #img {
   width: 100%;
   height: 60vh;
+  padding: 0 1vh;
 }
 /* END */
 
@@ -16,7 +17,7 @@
 .main-bar {
   background-color: #161a1e;
   height: 10vh;
-  margin-top: -1vh;
+  margin: -1vh 1vh 0 1vh;
   padding: 1vh 2vh 0 2vh;
   display: flex;
   justify-content: space-between;
@@ -27,18 +28,17 @@
 /* VERSION SELECT */
 .version-selector {
   margin-left: 2vh;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-#versionSelector {
-  transition: transform 0.5s ease;
+.version-selector, .version-img, #version-text, #version-selector {
+  cursor: pointer;
 }
 
-.rotate {
-  transform: rotate(-180deg);
+#version-selector {
+  transition: transform 0.5s ease;
 }
 
 .versions {
@@ -47,8 +47,7 @@
   padding: 0 2vh;
   border-radius: 15px;
   position: absolute;
-  left: 45%;
-  bottom: 5vh;
+  left: 50%;
 }
 
 #version-text {
@@ -101,6 +100,7 @@
   transform: translate(-50%, -50%);
   opacity: 0;
   transition: opacity 0.3s ease;
+  font-size: 2vh;
 }
 
 #play:hover::before {

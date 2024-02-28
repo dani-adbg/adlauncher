@@ -40,12 +40,15 @@ addEventListener('DOMContentLoaded', () => {
     this.removeEventListener('click', clickManager);
   }
 
+  function asdasd() {
+    window.adlauncher.input('user');
+    this.removeEventListener('click', asdasd);
+  }
+
   function userPar() {
     const $user = $$('.name');
     const $createUser = $('#create-user');
-    $createUser.addEventListener('click', () => {
-      window.adlauncher.input('user');
-    });
+    $createUser.addEventListener('click', asdasd);
     $user.forEach(element => {
       element.addEventListener('click', clickManager);
     })
@@ -55,7 +58,7 @@ addEventListener('DOMContentLoaded', () => {
     if(!$users.classList.contains('hidden')) {
       setTimeout(() => {
         userPar();
-      }, 1)
+      }, 10)
     }
   })
 });
