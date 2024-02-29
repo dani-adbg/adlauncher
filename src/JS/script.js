@@ -9,13 +9,17 @@ addEventListener('DOMContentLoaded', () => {
   const $versionsIcon = $('#version-selector');
   const $versionText = $('#version-text');
   const $userText = $('#profile-user');
+  const $changelogs = $('#changelogs');
+  const $logo = $('#img');
 
   let version, user;
 
-  $versions.classList.add('hidden');
-
   $settings.addEventListener('click', () => {
     document.location.href = 'pages/settings.html';
+  });
+
+  $changelogs.addEventListener('click', () => {
+    document.location.href = 'pages/changelogs.html';
   });
   
   $play.addEventListener('click', () => {
@@ -49,7 +53,11 @@ addEventListener('DOMContentLoaded', () => {
     $versions.classList.toggle('hidden');
     $versionsIcon.classList.toggle('rotate');
     this.removeEventListener('click', manejarClic);
-  }
+    let vImg = Math.floor(version.split('.')[1]);
+    if(!isNaN(vImg) && vImg !== 10 && !version.includes('fabric')) {
+      $logo.src = `assets/minecraft-1.${vImg}.jpg`;
+    };
+  };
 
   function plpl() {
     window.adlauncher.input('version');

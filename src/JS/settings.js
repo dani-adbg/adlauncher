@@ -12,9 +12,14 @@ addEventListener('DOMContentLoaded', () => {
   const $usersConfig = $('#users-config');
   const $usersList = $('.users-list');
   const $versions = $('.versions');
+  const $changelogs = $('#changelogs');
 
   $home.addEventListener('click', () => {
     document.location.href = '../index.html';
+  });
+
+  $changelogs.addEventListener('click', () => {
+    document.location.href = 'changelogs.html';
   });
 
   $root.addEventListener('click', () => {

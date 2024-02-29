@@ -1,0 +1,25 @@
+.main {
+  max-height: 100%;
+  overflow: auto;
+  margin: 0 2vh;
+}
+
+.version-label {
+  font-size: 4vh;
+  padding-bottom: 1vh;
+  border-bottom: 2px solid #fff;
+}
+
+.version-content {
+  padding: 2vh;
+}
+
+p {
+  margin-top: 2vh;
+}
+
+.version-img {
+  height: 50vh;
+  text-align: center;
+  margin: 2vh;
+}

@@ -59,6 +59,10 @@
   border-radius: 50%;
 }
 
+#profile-user, #profile {
+  cursor: pointer;
+}
+
 .users {
   background-color: #161a1e;
   max-height: 25vh;
