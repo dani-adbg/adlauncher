@@ -7,6 +7,11 @@ const inquirer = require('inquirer'); // Para crear menús interactivos
 const downloader = new Downloader();
 const launcher = new Launcher();
 
+// Eventos (Opcionales)
+downloader.on('downloadFiles', data => console.log(data));
+downloader.on('percentDownloaded', data => console.log(data));
+launcher.on('debug', data => console.log(data));
+
 // Directorio raíz de Minecraft en el sistema de archivos
 const root = `C:/Users/${PCuser}/AppData/Roaming/.minecraft`;
 
@@ -223,7 +228,9 @@ function launch() {
       max: '6G'
     }
   }
-
-  // Lanza el juego con las opciones especificadas
-  launcher.launch(launchOptions);
+ 
+  // Espera dos segundos y medio para que carguen todos los archivos y no hayan errores
+  setTimeout(() => {
+    launcher.launch(launchOptions); // Lanza el juego con las opciones especificadas
+  }, 2500);
 }
