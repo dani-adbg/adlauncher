@@ -4,6 +4,9 @@ const PCuser = require('os').userInfo().username; // Nombre de usuario del PC ac
 const fs = require('fs'); // Sistema de archivos
 const inquirer = require('inquirer'); // Para crear menús interactivos
 
+const downloader = new Downloader();
+const launcher = new Launcher();
+
 // Directorio raíz de Minecraft en el sistema de archivos
 const root = `C:/Users/${PCuser}/AppData/Roaming/.minecraft`;
 
