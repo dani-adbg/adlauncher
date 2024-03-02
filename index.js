@@ -1,61 +1,58 @@
-// LAUNCHER 
-const { Downloader, Launcher } = require('adlauncher-core');
-const PCuser = require('os').userInfo().username;
-const launcher = new Launcher();
-const downloader = new Downloader();
-// MENU
-const fs = require('fs');
-const root = `C:/Users/${PCuser}/AppData/Roaming/.minecraft`;
-const inquirer = require('inquirer');
-let user, version, data;
+// Importación de módulos necesarios
+const { Downloader, Launcher } = require('adlauncher-core'); // Módulos para descargar y lanzar Minecraft
+const PCuser = require('os').userInfo().username; // Nombre de usuario del PC actual
+const fs = require('fs'); // Sistema de archivos
+const inquirer = require('inquirer'); // Para crear menús interactivos
 
+// Directorio raíz de Minecraft en el sistema de archivos
+const root = `C:/Users/${PCuser}/AppData/Roaming/.minecraft`;
+
+let user, version, data; // Variables globales para el usuario, la versión y los datos de usuario
+
+// Función para obtener los datos del usuario
 function getData() {
-  // Obtener el último usuario
   try {
+    // Intenta leer el archivo de caché de usuarios
     data = fs.readFileSync(`${root}/usercache.JSON`, 'utf-8');
     data = JSON.parse(data);
-    fechas = data.map(item  => ({ ...item, fecha: new Date(item.fecha) }));
+    // Convierte las fechas en objetos Date para comparar
+    fechas = data.map(item => ({ ...item, fecha: new Date(item.fecha) }));
+    // Obtiene el usuario más reciente basado en la fecha
     user = fechas.reduce((fechaActual, fechaSiguiente) => {
       return fechaSiguiente > fechaActual ? fechaSiguiente : fechaActual;
     }, fechas[0]);
   } catch (error) {
+    // Si hay un error al leer los datos del usuario, solicita la configuración del usuario
     return userConfig();
   }
-
-  // Ejecutar el menu principal
+  // Si se obtienen los datos del usuario con éxito, muestra el menú principal
   menu();
 }
 
+// Llamada inicial para obtener los datos del usuario al inicio del programa
 getData();
 
+// Función para mostrar el menú principal
 function menu() {
+  // Opciones del menú principal
   const optionsMenu = [{
     type: 'list',
     name: 'option',
-    message: 'Seleccione una opción (usa las flechas arriba/abajo y presiona Enter',
+    message: 'Seleccione una opción:',
     choices: [
-      {
-        value: '1',
-        name: 'JUGAR'
-      },
-      {
-        value: '2',
-        name: `User: ${user.name !== undefined ? user.name : user}`
-      },
-      {
-        value: '3',
-        name: `Version: ${version !== undefined ? version : 'Selecciona la version'}`
-      },
-      {
-        value: '4',
-        name: 'Salir'
-      }
+      { value: '1', name: 'JUGAR' },
+      { value: '2', name: `User: ${user.name !== undefined ? user.name : user}` },
+      { value: '3', name: `Version: ${version !== undefined ? version : 'Selecciona la version'}` },
+      { value: '4', name: 'Salir' }
     ]
   }];
 
+  // Limpia la consola y muestra el título del menú
   console.clear();
   console.log('BIENVENIDO A ADLAUNCHER');
   console.log('MENU:');
+
+  // Muestra el menú y ejecuta la opción seleccionada
   inquirer.prompt(optionsMenu).then(a => {
     switch (a.option) {
       case '1':
@@ -76,25 +73,24 @@ function menu() {
   }).catch(e => console.log(e));
 }
 
+// Función para configurar el usuario
 function userConfig() {
+  // Muestra las opciones de configuración de usuario
   data = data ? data.map(x => x.name) : [];
   console.clear();
   console.log('CONFIGURACION DE USUARIO');
   let optionsUsers = [{
     type: 'list',
     name: 'userOption',
-    message: 'Escoge una opcion de usuario',
+    message: 'Escoge una opción de usuario:',
     choices: [
-      {
-        name: 'Crear nuevo usuario'
-      },
+      { name: 'Crear nuevo usuario' },
       ...data,
-      {
-        name: 'Salir'
-      }
+      { name: 'Salir' }
     ]
   }];
 
+  // Solicita al usuario que elija una opción de usuario
   inquirer.prompt(optionsUsers).then(a => {
     switch (a.userOption) {
       case 'Crear nuevo usuario':
@@ -111,57 +107,60 @@ function userConfig() {
   })
 }
 
+// Función para crear un nuevo usuario
 function newUser() {
   console.clear();
   console.log('CREA UN NUEVO USUARIO: ');
 
-  const nUser = [
-    {
-      type: 'input',
-      name: 'username',
-      message: 'Ingresa un nuevo nombre de usuario',
-      validate(value) {
-        if(value.length === 0) {
-          return 'Ingresa un valor';
-        }
-        return true;
+  // Pide al usuario que ingrese un nuevo nombre de usuario
+  const nUser = [{
+    type: 'input',
+    name: 'username',
+    message: 'Ingresa un nuevo nombre de usuario:',
+    validate(value) {
+      if (value.length === 0) {
+        return 'Ingresa un valor válido';
       }
+      return true;
     }
-  ];
+  }];
 
+  // Solicita al usuario que ingrese el nombre de usuario y lo establece como el usuario actual
   inquirer.prompt(nUser).then(a => {
     user = a.username;
     menu();
   })
 }
 
+// Función para mostrar las versiones disponibles
 function versions() {
   let files = [];
   try {
+    // Intenta leer los archivos en el directorio de versiones de Minecraft
     files = fs.readdirSync(`${root}/versions`);
-  } catch(error) {
+  } catch (error) {
     files = [];
   }
   console.clear();
   console.log("CONFIGURACION DE VERSIONES");
+
+  // Opciones para el menú de selección de versiones
   const optionsVersions = [{
     type: 'list',
     name: 'versionConfig',
-    message: 'Escoge una opción de versión',
+    message: 'Escoge una opción de versión:',
     choices: [
-      {
-        name: 'Descargar version'
-      },
+      { name: 'Descargar versión' },
       ...files,
-      {
-        name: 'Salir'
-      }
+      { name: 'Salir' }
     ]
   }];
+
+  // Solicita al usuario que elija una opción de versión
   inquirer.prompt(optionsVersions).then(a => {
     let option = a.versionConfig;
     switch (option) {
-      case 'Descargar version':
+      case 'Descargar versión':
         newVersion();
         break;
       case 'Salir':
@@ -175,47 +174,53 @@ function versions() {
   })
 }
 
+// Función para descargar una nueva versión
 function newVersion() {
   console.clear();
-  console.log('DESCARGA UNA NUEVA VERSION: ');
+  console.log('DESCARGA UNA NUEVA VERSIÓN: ');
 
-  const nVersion = [
-    {
-      type: 'input',
-      name: 'version',
-      message: 'Ingresa la version que quieras descargar',
-      validate(value) {
-        if(value.length === 0) {
-          return 'Ingresa un valor';
-        }
-        return true;
+  // Pide al usuario que ingrese la versión que desea descargar
+  const nVersion = [{
+    type: 'input',
+    name: 'version',
+    message: 'Ingresa la versión que quieres descargar:',
+    validate(value) {
+      if (value.length === 0) {
+        return 'Ingresa un valor válido';
       }
+      return true;
     }
-  ];
+  }];
 
+  // Solicita al usuario que ingrese la versión y luego inicia la descarga
   inquirer.prompt(nVersion).then(async a => {
     version = a.version;
 
+    // Descarga la versión y luego muestra el menú principal
     await downloader.download(version, root);
     menu();
   })
 }
 
+// Función para salir del programa
 function exit() {
+  // Termina el proceso actual
   process.exit(0);
 }
 
+// Función para lanzar el juego
 function launch() {
   const name = user.name == undefined ? user : user.name;
   const launchOptions = {
-    username: name, 
-    version: version, 
+    username: name,
+    version: version,
     gameDirectory: root,
-    memory: { 
-      min: '2G', 
-      max: '6G'  
+    memory: {
+      min: '2G',
+      max: '6G'
     }
   }
-  
+
+  // Lanza el juego con las opciones especificadas
   launcher.launch(launchOptions);
 }
