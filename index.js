@@ -1,3 +1,4 @@
+// PAQUETES IMPORTADOS
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const prompt = require('electron-prompt');
 const path = require('path');
@@ -7,19 +8,24 @@ const { Launcher, Downloader } = require('adlauncher-core');
 const launcher = new Launcher();
 const downloader = new Downloader();
 const os = require('os');
+const { spawn, execSync } = require('child_process');
+const fetch = require('electron-fetch').default;
 
-// MINECRAFT 
+// VARIABLES
 const User = os.userInfo().username;
 const appRoot = `C:/Users/${User}/AppData/Roaming/adlauncher`;
 let mainRoot = `C:/Users/${User}/AppData/Roaming/.minecraft`;
+let javaRoot = 'C:/Program Files/Java/jdk-17/bin/java';
+let java8Root = 'C:/Program Files/Java/jre-1.8/bin/java';
+let configFile, maxMem, minMem, user, users, versions;
 
 // CREA EL ARCHIVO DE CONFIGS
 if(!fs.existsSync(path.resolve(appRoot, 'configs', 'settings.json'))) {
   fs.mkdirSync(path.resolve(appRoot, 'configs'), { recursive: true });
-  fs.writeFileSync(path.resolve(appRoot, 'configs', 'settings.json'), JSON.stringify({ gameDirectory: mainRoot, memory: { max: '6G', min: '3G'}, users: []}));
+  fs.writeFileSync(path.resolve(appRoot, 'configs', 'settings.json'), JSON.stringify({ javaPath: javaRoot, java8Path: java8Root, gameDirectory: mainRoot, memory: { max: '6G', min: '3G'}, users: ['Steve']}));
 };
+
 // LEE EL ARCHIVO DE CONFIGS
-let configFile, maxMem, minMem, user, users, versions;
 function reloadConfigs() {
   configFile = JSON.parse(fs.readFileSync(path.resolve(appRoot, 'configs', 'settings.json')));
 
@@ -35,7 +41,7 @@ function reloadConfigs() {
     user = configFile.users[0];
   } catch (error) {
     user = 'Steve';
-  }
+  };
 
   // OBTIENE LOS USUARIOS REGISTRADOS
   users = configFile.users;
@@ -47,26 +53,65 @@ function reloadConfigs() {
   } catch(error) {
     versions = [];
   };
-}
+
+  javaRoot = configFile.javaPath;
+  java8Root = configFile.java8Path;
+};
 reloadConfigs();
 
+// CHECKJAVA
+function checkJava(javaVersions) {
+  javaVersions.forEach(javaSpawn => {
+    const java = spawn(javaSpawn, ['-version']);
 
-function minecraftLaunch(username, version, memory) {
-  const launcherOptions = {
-    username: username,
-    version: version,
-    gameDirectory: mainRoot,
-    memory: {
-      max: memory.max,
-      min: memory.min
-    }
-  }
+    java.on('error', (error) => {
+      if(javaSpawn.includes('1.8')) {
+        downloadJava('https://javadl.oracle.com/webapps/download/AutoDL?BundleId=249553_4d245f941845490c91360409ecffb3b4', 'java8.exe');
+      } else {
+        downloadJava('https://download.oracle.com/java/17/archive/jdk-17.0.10_windows-x64_bin.exe', 'java17.exe');
+      };
+      console.log(`Descargando Java ${javaSpawn}`);
+    });
+    
+    java.on('exit', (code) => {
+      if(code === 0) {
+        console.log(`Java ${javaSpawn}`);
+      } else {
+        console.log('No se ha encontrado Java');
+      };
+    });
+  });
+};
+
+// DOWNLOAD JAVA
+async function downloadJava(javaUri, name) {
+  try {
+    const filePath = path.join(__dirname, name);
+    console.log(filePath);
+    const response = await fetch(javaUri);
+    
+    const writeStream = fs.createWriteStream(filePath);
+    response.body.pipe(writeStream);
   
-  launcher.launch(launcherOptions);
-}
+    await new Promise((resolve, reject) => {
+      writeStream.on('finish', resolve);
+      writeStream.on('error', reject);
+    });
+  
+    execSync(filePath);
+    fs.unlinkSync(filePath);
+  
+    console.log(`Java ${name} instalado correctamente.`);
+  } catch (error) {
+    console.log(error);
+  };
+};
+
+checkJava([javaRoot, java8Root]);
 
 // ELECTRON
 const createWindow = () => {
+  // CREA LA VENTANA
   const win = new BrowserWindow({
     width: 800,
     height: 600,
@@ -74,14 +119,13 @@ const createWindow = () => {
       contextIsolation: true,
       preload: path.join(__dirname, 'src', 'preload.js'),
     },
-    // ESCONDE LA BARRA MENU
     autoHideMenuBar: true,
     icon: path.join(__dirname, 'src', 'assets', 'icon.png'),
     resizable: false,
-    // frame: false
   });
-  // ELIMINA LA BARRA
   win.menuBarVisible = false;
+
+  // EVENTOS DEL PROGRAMA
   ipcMain.on('redirect', (event, uri) => {
     const wi = new BrowserWindow({ parent: win });
     switch (uri) {
@@ -96,20 +140,20 @@ const createWindow = () => {
         break;
       default:
         break;
-    }
-  })
+    };
+  });
 
   ipcMain.on('getImg', (event, version) => {
     reloadConfigs();
     win.webContents.send('sendImg', version);
   });
 
-  ipcMain.on('getVersions', (event) => {
+  ipcMain.on('getVersions', () => {
     reloadConfigs();
     win.webContents.send('sendVersions', versions);
   });
 
-  ipcMain.on('getUser', (event) => {
+  ipcMain.on('getUser', () => {
     reloadConfigs();
     win.webContents.send('sendUser', user);
   });
@@ -119,28 +163,33 @@ const createWindow = () => {
     win.webContents.send('sendUsers', users, settings);
   });
 
-  // ipcMain.on('createUser', (event) => {
-  //   win.webContents.send('createUser');
-  // });
-
-  ipcMain.on('play', (event, user, version, ) => {
+  ipcMain.on('play', (event, user, version) => {
     reloadConfigs();
-    minecraftLaunch(user, version, { max: '6G', min: '3G' });
+
+    launcher.launch({
+      username: user,
+      version: version,
+      gameDirectory: mainRoot,
+      memory: {
+        max: memory.max,
+        min: memory.min
+      }
+    });
   });
 
-  ipcMain.on('getSettings', (event) => {
+  ipcMain.on('getSettings', () => {
     reloadConfigs();
-    win.webContents.send('sendSettings', mainRoot, minMem, maxMem)
+    win.webContents.send('sendSettings', mainRoot, minMem, maxMem);
   });
 
-  ipcMain.on('changeRoot', async (event) => {
+  ipcMain.on('changeRoot', async () => {
     reloadConfigs();
     const dir = await dialog.showOpenDialog({ properties: ['openDirectory']});
     if(dir.filePaths.length !== 0) {
       configFile.gameDirectory = dir.filePaths[0].replace(/\\/g, '/');
       
       win.webContents.send('changeRoot', configFile.gameDirectory);
-    }
+    };
   });
 
   ipcMain.on('input', async (event, opt) => {
@@ -189,7 +238,7 @@ const createWindow = () => {
           configFile.users.push(newUser);
           fs.writeFileSync(path.resolve(appRoot, 'configs', 'settings.json'), JSON.stringify(configFile));
           repeated = false;
-        }
+        };
         win.webContents.send('newUser', newUser, repeated);
         reloadConfigs();
         break;
@@ -204,8 +253,7 @@ const createWindow = () => {
           type: 'input'  
         });
 
-        downloader.download(newVersion, mainRoot)
-
+        downloader.download(newVersion, mainRoot);
         win.webContents.send('newVersion', newVersion);
         break;
       default:
@@ -224,7 +272,7 @@ const createWindow = () => {
       win.webContents.send('succesSaveSettings');
       fs.writeFileSync(path.resolve(appRoot, 'configs', 'settings.json'), JSON.stringify(configFile));
       reloadConfigs();
-    }
+    };
   });
 
   ipcMain.on('delete', (event, element, type) => {
@@ -235,9 +283,10 @@ const createWindow = () => {
     } else {
       configFile.users = configFile.users.filter(x => x !== element);
       fs.writeFileSync(path.resolve(appRoot, 'configs', 'settings.json'), JSON.stringify(configFile));
-    }
-  })
+    };
+  });
 
+  // CARGA EL ARCHIVO PRINCIPAL EN LA VENTANA
   win.loadFile(path.join(__dirname, 'src', 'index.html'));
 };
 
