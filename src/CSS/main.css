@@ -138,63 +138,36 @@
 }
 /* END */
 
-/* WELCOME MESSAGE */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0, 0, 0, 0.5);
+/* DOWNLOAD BAR */
+.download-bar {
+  position: absolute;
+  bottom: 5vh;
+  width: 80%;
+  padding: 0 1vh;
+  height: 6vh;
+  display: flex;
 }
 
-.modal-content {
-  background-color: #222831;
+.mini-bar {
+  background-color: #45a049;
+  height: 100%;
+  width: calc(100% / 10);
+  /* border: 1px #000 solid; */
+}
+
+#download-percent {
   position: absolute;
   top: 50%;
-  left: calc(50% + 20px);
+  left: 50%;
   transform: translate(-50%, -50%);
-  padding: 20px;
-  border: 1px solid #888;
-  width: 80%;
-  max-width: 500px;
-  text-align: center;
 }
-
-.close {
-  color: #a3a3a3;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.buy-button {
-  background-color: #4CAF50;
-  color: white;
-  padding: 10px 20px;
-  font-size: 16px;
-  text-decoration: none;
-  border-radius: 5px;
-  border: none;
-  cursor: pointer;
-}
-
-.buy-button:hover {
-  background-color: #45a049;
-}
-/* END */
 
 /* VERSION IMG */
 .version-img {
   height: 5vh;
   width: 5vh;
+}
+
+.hidden {
+  display: none;
 }

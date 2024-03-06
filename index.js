@@ -13,8 +13,8 @@ const fetch = require('electron-fetch').default;
 
 // VARIABLES
 const User = os.userInfo().username;
-const appRoot = `C:/Users/${User}/AppData/Roaming/adlauncher`;
 let mainRoot = `C:/Users/${User}/AppData/Roaming/.minecraft`;
+const appRoot = `${mainRoot}/.adlauncher`;
 let javaRoot = 'C:/Program Files/Java/jdk-17/bin/java';
 let java8Root = 'C:/Program Files/Java/jre-1.8/bin/java';
 let configFile, maxMem, minMem, user, users, versions;
@@ -22,7 +22,7 @@ let configFile, maxMem, minMem, user, users, versions;
 // CREA EL ARCHIVO DE CONFIGS
 if(!fs.existsSync(path.resolve(appRoot, 'configs', 'settings.json'))) {
   fs.mkdirSync(path.resolve(appRoot, 'configs'), { recursive: true });
-  fs.writeFileSync(path.resolve(appRoot, 'configs', 'settings.json'), JSON.stringify({ javaPath: javaRoot, java8Path: java8Root, gameDirectory: mainRoot, memory: { max: '6G', min: '3G'}, users: ['Steve']}));
+  fs.writeFileSync(path.resolve(appRoot, 'configs', 'settings.json'), JSON.stringify({ javaPath: javaRoot, java8Path: java8Root, gameDirectory: mainRoot, memory: { max: '4G', min: '2G'}, users: ['Steve']}));
 };
 
 // LEE EL ARCHIVO DE CONFIGS
@@ -54,6 +54,7 @@ function reloadConfigs() {
     versions = [];
   };
 
+  // OBTIENE LOS DIRECTORIOS DE JAVA
   javaRoot = configFile.javaPath;
   java8Root = configFile.java8Path;
 };
@@ -64,20 +65,11 @@ function checkJava(javaVersions) {
   javaVersions.forEach(javaSpawn => {
     const java = spawn(javaSpawn, ['-version']);
 
-    java.on('error', (error) => {
+    java.on('error', () => {
       if(javaSpawn.includes('1.8')) {
         downloadJava('https://javadl.oracle.com/webapps/download/AutoDL?BundleId=249553_4d245f941845490c91360409ecffb3b4', 'java8.exe');
       } else {
         downloadJava('https://download.oracle.com/java/17/archive/jdk-17.0.10_windows-x64_bin.exe', 'java17.exe');
-      };
-      console.log(`Descargando Java ${javaSpawn}`);
-    });
-    
-    java.on('exit', (code) => {
-      if(code === 0) {
-        console.log(`Java ${javaSpawn}`);
-      } else {
-        console.log('No se ha encontrado Java');
       };
     });
   });
@@ -86,8 +78,7 @@ function checkJava(javaVersions) {
 // DOWNLOAD JAVA
 async function downloadJava(javaUri, name) {
   try {
-    const filePath = path.join(__dirname, name);
-    console.log(filePath);
+    const filePath = path.join(appRoot, name);
     const response = await fetch(javaUri);
     
     const writeStream = fs.createWriteStream(filePath);
@@ -118,6 +109,7 @@ const createWindow = () => {
     webPreferences: {
       contextIsolation: true,
       preload: path.join(__dirname, 'src', 'preload.js'),
+      devTools: false
     },
     autoHideMenuBar: true,
     icon: path.join(__dirname, 'src', 'assets', 'icon.png'),
@@ -163,18 +155,20 @@ const createWindow = () => {
     win.webContents.send('sendUsers', users, settings);
   });
 
-  ipcMain.on('play', (event, user, version) => {
+  ipcMain.on('play', async (event, user, version) => {
     reloadConfigs();
 
-    launcher.launch({
+    await launcher.launch({
       username: user,
       version: version,
       gameDirectory: mainRoot,
       memory: {
-        max: memory.max,
-        min: memory.min
+        max: maxMem,
+        min: minMem
       }
     });
+
+    win.minimize();
   });
 
   ipcMain.on('getSettings', () => {
@@ -253,8 +247,26 @@ const createWindow = () => {
           type: 'input'  
         });
 
-        downloader.download(newVersion, mainRoot);
-        win.webContents.send('newVersion', newVersion);
+        if(newVersion.length === 0 || newVersion.match(/\b1\.\d+(\.\d+)?\b/g) === null) {
+          win.webContents.send('errorVersion');
+        } else {
+          downloader.download(newVersion, mainRoot);
+          downloader.on('percentDownloaded', data => {
+            if(data.includes('100%')) {
+              data = 'Instalando...';
+              win.webContents.send('percentDownloaded', data);
+            } else {
+              win.webContents.send('percentDownloaded', data);
+            };
+          });
+          downloader.on('downloadFiles', data => {
+            if(data.includes('All files are downloaded')) {
+              win.webContents.send('versionDownloaded');
+            } else if(data.includes('Minecraft')) {
+              win.webContents.send('versionDownloading', newVersion);
+            };
+          });
+        };
         break;
       default:
         break;
@@ -305,4 +317,8 @@ app.on('window-all-closed', () => {
   if(process.platform !== 'darwin') {
     app.quit();
   };
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.log('Unhandled Rejection at:', promise, 'reason:', reason);
 });

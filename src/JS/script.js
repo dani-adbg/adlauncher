@@ -11,6 +11,7 @@ addEventListener('DOMContentLoaded', () => {
   const $userText = $('#profile-user');
   const $changelogs = $('#changelogs');
   const $logo = $('#img');
+  const $downloadBar = $('.download-bar');
 
   let version, user;
 
@@ -24,7 +25,8 @@ addEventListener('DOMContentLoaded', () => {
   
   $play.addEventListener('click', () => {
     user = $userText.textContent;
-    if(!version || version === 'Descargar Version' || !user) {
+    version = $versionText.textContent;
+    if(!version || version === 'Descargar Version' || version === 'Select a Version' || !user) {
       alert('Select a version and user');
     } else {
       window.adlauncher.play(user, version);
@@ -42,8 +44,8 @@ addEventListener('DOMContentLoaded', () => {
     if(!$versions.classList.contains('hidden')) {
       setTimeout(() => {
         versionpar();
-      }, 10)
-    }
+      }, 10);
+    };
   });
 
   function manejarClic() {
@@ -60,8 +62,12 @@ addEventListener('DOMContentLoaded', () => {
   };
 
   function plpl() {
-    window.adlauncher.input('version');
-    this.removeEventListener('click', plpl);
+    if($downloadBar.classList.contains('hidden')) {
+      window.adlauncher.input('version');
+      this.removeEventListener('click', plpl);
+    } else {
+      alert('Ya se está descargando una versión...')
+    }
   }
 
   function versionpar() {
@@ -74,36 +80,5 @@ addEventListener('DOMContentLoaded', () => {
     $version.forEach(element => {
       element.addEventListener("click", manejarClic);
     });
-  }
-
-  // WELCOME
-  let modal = $("#welcomeModal");
-  let closeBtn = $(".close")[0];
-
-  function hasSeenWelcomeMessage() {
-    return localStorage.getItem("welcomeMessageDisplayed");
-  }
-
-  function markWelcomeMessageAsSeen() {
-    localStorage.setItem("welcomeMessageDisplayed", "true");
-  }
-
-  function displayWelcomeMessage() {
-    if (!hasSeenWelcomeMessage()) {
-      modal.style.display = "block";
-      markWelcomeMessageAsSeen();
-    }
-  }
-
-  window.onload = displayWelcomeMessage;
-
-  closeBtn.onclick = function () {
-    modal.style.display = "none";
-  }
-
-  window.onclick = function (event) {
-    if (event.target == modal) {
-      modal.style.display = "none";
-    }
   }
 });

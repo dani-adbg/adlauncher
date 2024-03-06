@@ -113,33 +113,6 @@
   grid-row: 2 / 5;
 }
 
-/* Media Queries */
-/* @media screen and (max-width: 768px) {
-  .container {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto;
-  }
-
-  #nav {
-    grid-column: 1;
-    grid-row: 1;
-  }
-
-  #side-bar {
-    grid-column: 1;
-    grid-row: 2;
-  }
-
-  .main {
-    grid-column: 1;
-    grid-row: 3;
-  }
-
-  .side-bar-options {
-    margin-top: 5vh;
-  }
-} */
-
 /* Hover Animations */
 .profile:hover {
   transform: scale(1.1) rotate(5deg);

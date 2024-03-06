@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <title>ADLauncher</title>
   <link rel="stylesheet" href="CSS/style.css">
   <link rel="stylesheet" href="CSS/main.css">
@@ -10,25 +10,6 @@
   <script src="JS/script.js"></script>
 </head>
 <body>
-
-<!-- Dentro del body del HTML -->
-<div id="welcomeModal" class="modal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h2>Bienvenido a ADLauncher</h2>
-    <p>Estamos aquí para ofrecerte una experiencia de juego increíble,
-       especialmente pensada para aquellos que quizás no pueden permitirse comprar el juego original. Sin embargo, es importante tener en cuenta que la piratería no está bien. Valoramos el arduo trabajo de los desarrolladores
-        y queremos apoyarlos para que puedan seguir creando los juegos que tanto disfrutamos. Por eso, mientras disfrutas de tu experiencia de juego con nosotros, recuerda siempre
-       apoyar a los desarrolladores comprando juegos originales. ¡Diviértete y juega con responsabilidad!
-    </p>
-    <br>
-    <br>
-    <a href="https://www.minecraft.net/es-es" class="buy-button">
-      Comprar Minecraft
-    </a>
-  </div>
-</div>
-
   <div class="container">
     <!-- HEADER Y BARRA DE OPCIONES -->
     <nav id="nav">
@@ -61,11 +42,14 @@
       </div>
       <div class="main-bar">
         <div class="version-selector">
-          <img src="assets/icon.png" class="version-img">
+          <img src="assets/icon.png" class="version-img" alt="img">
           <span id="version-text">Select a Version</span> <i id="version-selector" class="fa-solid fa-caret-down"></i>
         </div>
         <div class="versions hidden"></div>
         <button id="play"></button>
+      </div>
+      <div class="download-bar hidden">
+        <span id="download-percent">Iniciando Descarga...</span>
       </div>
     </div>
   </div>

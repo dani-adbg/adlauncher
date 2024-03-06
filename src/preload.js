@@ -81,22 +81,36 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  ipcRenderer.on('newVersion', (event, version) => {
-    if(version === 'ERROR') {
-      alert('Ingresa una versión válida.');
-    } else {
-      $('#version-text').innerText = version;
-    }
-  });
-
   ipcRenderer.on('memoriesError', (event) => {
     alert('No se pueden ajustar las memorias a esa cantidad');
   });
-
+  
   ipcRenderer.on('succesSaveSettings', (event) => {
     alert('Ajustes guardados correctamente');
   });
   
+  ipcRenderer.on('errorVersion', () => {
+    alert('Ingresa una versión válida.');
+  });
+  
+  const $downloadBar = $('.download-bar');
+  ipcRenderer.on('percentDownloaded', (_event, percent) => {
+    percent = percent.split(' ')[0];
+    $('#download-percent').innerText = percent;
+    $downloadBar.innerHTML += "<div class='mini-bar'></div>";
+  });
+  
+  ipcRenderer.on('versionDownloaded', () => {
+    alert('Version Descargada');
+    $downloadBar.innerHTML = '<span id="download-percent">Iniciando Descarga...</span>';
+    $downloadBar.classList.toggle('hidden');
+  });
+
+  ipcRenderer.on('versionDownloading', (_event, newVersion) => {
+    $downloadBar.classList.toggle('hidden');
+    $('#version-text').innerText = newVersion;
+  });
+
   contextBridge.exposeInMainWorld('adlauncher', {
     // ALL
     redirect: (url) => ipcRenderer.send('redirect', url),
