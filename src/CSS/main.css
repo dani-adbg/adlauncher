@@ -138,30 +138,6 @@
 }
 /* END */
 
-/* DOWNLOAD BAR */
-.download-bar {
-  position: absolute;
-  bottom: 5vh;
-  width: 80%;
-  padding: 0 1vh;
-  height: 6vh;
-  display: flex;
-}
-
-.mini-bar {
-  background-color: #45a049;
-  height: 100%;
-  width: calc(100% / 10);
-  /* border: 1px #000 solid; */
-}
-
-#download-percent {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
 /* VERSION IMG */
 .version-img {
   height: 5vh;

@@ -13,6 +13,7 @@ addEventListener('DOMContentLoaded', () => {
   const $usersList = $('.users-list');
   const $versions = $('.versions');
   const $changelogs = $('#changelogs');
+  const $versionsPage = $('#versions');
 
   $home.addEventListener('click', () => {
     document.location.href = '../index.html';
@@ -20,6 +21,10 @@ addEventListener('DOMContentLoaded', () => {
 
   $changelogs.addEventListener('click', () => {
     document.location.href = 'changelogs.html';
+  });
+
+  $versionsPage.addEventListener('click', () => {
+    document.location.href = 'versions.html';
   });
 
   $root.addEventListener('click', () => {
@@ -105,7 +110,6 @@ addEventListener('DOMContentLoaded', () => {
   function usersConfigPar() {
     const $delete = $usersList.querySelectorAll('.delete');
     $delete.forEach(element => {
-      console.log(element)
       element.addEventListener('click', clickManager);
     });
   }

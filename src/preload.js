@@ -5,16 +5,11 @@ window.addEventListener('DOMContentLoaded', () => {
 
   ipcRenderer.on('sendVersions', (_event, versions) => {
     const $versions = $('.versions');
-    versions.unshift('Descargar Version');
     if($versions.children.length === 0) {
       versions.forEach(element => {
-        if(element === 'Descargar Version') {
-          $versions.innerHTML += `<div class='version' id='download-version'>${element}</div>`;
-        } else {
-          $versions.innerHTML += `<div class='version'>${element}</div>`;
-        }
+        $versions.innerHTML += `<div class='version'>${element}</div>`;
       });
-    }
+    };
   });
 
   ipcRenderer.on('sendImg', (_event, version) => {
@@ -93,22 +88,38 @@ window.addEventListener('DOMContentLoaded', () => {
     alert('Ingresa una versión válida.');
   });
   
-  const $downloadBar = $('.download-bar');
+  const $downloadBar = $('.progress-container');
+  const $progressText = $('.progress-text');
+  const $progressBar = $('.progress-bar');
+
   ipcRenderer.on('percentDownloaded', (_event, percent) => {
+    if($downloadBar.classList.contains('hidden')) {
+      $downloadBar.classList.remove('hidden');
+    }
     percent = percent.split(' ')[0];
-    $('#download-percent').innerText = percent;
-    $downloadBar.innerHTML += "<div class='mini-bar'></div>";
+    $progressText.textContent = percent;
+    $progressText.style.left = '45%';
+    $progressBar.style.width = percent;
+    if(percent === 'Instalando...') {
+      $progressBar.style.width = '100%';
+      $progressText.style.left = '38%';
+    };
   });
   
   ipcRenderer.on('versionDownloaded', () => {
-    alert('Version Descargada');
-    $downloadBar.innerHTML = '<span id="download-percent">Iniciando Descarga...</span>';
+    alert('Version Downloaded');
+    location.reload();
+  });
+
+  ipcRenderer.on('versionDownloading', (_event) => {
     $downloadBar.classList.toggle('hidden');
   });
 
-  ipcRenderer.on('versionDownloading', (_event, newVersion) => {
-    $downloadBar.classList.toggle('hidden');
-    $('#version-text').innerText = newVersion;
+  ipcRenderer.on('sendVersionsPages', (_event, versions) => {
+    const container = $('.versions');
+    versions.forEach(version => {
+      container.innerHTML += `<div class='version'>${version.id}</div>`;
+    });
   });
 
   contextBridge.exposeInMainWorld('adlauncher', {
@@ -125,6 +136,9 @@ window.addEventListener('DOMContentLoaded', () => {
     changeRoot: () => ipcRenderer.send('changeRoot'),
     input: (opt) => ipcRenderer.send('input', opt),
     saveSettings: (newRoot, newMin, newMax) => ipcRenderer.send('saveSettings', newRoot, newMin, newMax),
-    delete: (element, type) => ipcRenderer.send('delete', element, type)
+    delete: (element, type) => ipcRenderer.send('delete', element, type),
+    // VERSIONS PAGE
+    getVersionsPages: () => ipcRenderer.send('getVersionsPages'),
+    downloadVersion: (version) => ipcRenderer.send('downloadVersion', version)
   });
 });

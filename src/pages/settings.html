@@ -23,7 +23,7 @@
       <div class="side-bar-options">
         <span id="home"><i class="fa-solid fa-house"></i></i> HOME</span>
         <span id="changelogs"><i class="fa-solid fa-book"></i> CHANGELOGS</span>
-        <span id="help"><i class="fa-solid fa-question"></i> HELP</span>
+        <span id="versions"><i class="fa-solid fa-download"></i> VERSIONS</span>
         <span id="discord"><i class="fa-brands fa-discord"></i> DISCORD</span>
         <span id="yt"><i class="fa-brands fa-youtube"></i> YOUTUBE</span>
         <span id="github"><i class="fa-brands fa-github"></i> GITHUB</span>
@@ -51,17 +51,21 @@
         </div>
         <div class="versions-settings">
           <div class="boxlabel"><span>Version Configuration</span></div>
-          <div id="versions-config" class="listbox box">Despliega la lista de versiones descargadas <i id="selector-versions" class="fa-solid fa-caret-down selector"></i></div>
+          <div id="versions-config" class="listbox box">Display the list of downloaded versions <i id="selector-versions" class="fa-solid fa-caret-down selector"></i></div>
           <div class="versions hidden"></div>
         </div>
         <div class="users-settings">
           <div class="boxlabel"><span>Configuración de Usuarios</span></div>
-          <div id="users-config" class="listbox box">Despliega la lista de usuarios registrados <i id="selector-users" class="fa-solid fa-caret-down selector"></i></div>
+          <div id="users-config" class="listbox box">Display the list of registered users <i id="selector-users" class="fa-solid fa-caret-down selector"></i></div>
           <div class="users-list hidden"></div>
         </div>
         <div class="savesettings boxlabel">
           <button id="save">Save</button>
         </div>
+      </div>
+      <div class="progress-container hidden">
+        <div class="progress-bar" value="0" max="100"></div>
+        <span class="progress-text">Iniciando Descarga</span>
       </div>
     </main>
   </div>

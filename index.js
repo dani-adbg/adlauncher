@@ -237,37 +237,6 @@ const createWindow = () => {
         reloadConfigs();
         break;
 
-      case 'version':
-        const newVersion = await prompt({
-          title: 'Ingrese la nueva version',
-          label: 'Version',
-          inputAttrs: {
-            type: 'text'
-          },
-          type: 'input'  
-        });
-
-        if(newVersion.length === 0 || newVersion.match(/\b1\.\d+(\.\d+)?\b/g) === null) {
-          win.webContents.send('errorVersion');
-        } else {
-          downloader.download(newVersion, mainRoot);
-          downloader.on('percentDownloaded', data => {
-            if(data.includes('100%')) {
-              data = 'Instalando...';
-              win.webContents.send('percentDownloaded', data);
-            } else {
-              win.webContents.send('percentDownloaded', data);
-            };
-          });
-          downloader.on('downloadFiles', data => {
-            if(data.includes('All files are downloaded')) {
-              win.webContents.send('versionDownloaded');
-            } else if(data.includes('Minecraft')) {
-              win.webContents.send('versionDownloading', newVersion);
-            };
-          });
-        };
-        break;
       default:
         break;
     }
@@ -296,6 +265,33 @@ const createWindow = () => {
       configFile.users = configFile.users.filter(x => x !== element);
       fs.writeFileSync(path.resolve(appRoot, 'configs', 'settings.json'), JSON.stringify(configFile));
     };
+  });
+
+  // VERSIONS PAGES
+  ipcMain.on('getVersionsPages', async () => {
+    downloader.getVersions('vanilla').then((versions) => {
+      versions = versions.filter(x => x.id.split('.')[1] >= 8);
+      win.webContents.send('sendVersionsPages', versions);
+    });
+  });
+
+  ipcMain.on('downloadVersion', (event, version) => {
+    downloader.download(version, mainRoot);
+    downloader.on('percentDownloaded', data => {
+      if(data.includes('100%')) {
+        data = 'Instalando...';
+        win.webContents.send('percentDownloaded', data);
+      } else {
+        win.webContents.send('percentDownloaded', data);
+      };
+    });
+    downloader.on('downloadFiles', data => {
+      if(data.includes('All files are downloaded')) {
+        win.webContents.send('versionDownloaded');
+      } else if(data.includes('Minecraft')) {
+        win.webContents.send('versionDownloading');
+      };
+    });
   });
 
   // CARGA EL ARCHIVO PRINCIPAL EN LA VENTANA

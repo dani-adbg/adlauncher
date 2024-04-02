@@ -1,0 +1,24 @@
+.versions {
+  height: 80vh;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(80px, 1fr));
+}
+
+.version {
+  width: 18vh;
+  height: 5vh;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  justify-content: center;
+  background-color: darkgreen;
+  border-radius: 25px;
+  margin: 2vh;
+}
+
+.version:hover {
+  cursor: pointer;
+  background-color: rgba(128, 47, 0, 0.829);
+  transition: ease 0.3s;
+}

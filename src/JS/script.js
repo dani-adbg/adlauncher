@@ -11,7 +11,8 @@ addEventListener('DOMContentLoaded', () => {
   const $userText = $('#profile-user');
   const $changelogs = $('#changelogs');
   const $logo = $('#img');
-  const $downloadBar = $('.download-bar');
+  const $downloadBar = $('.progress-container hidden');
+  const $versionsPage = $('#versions')
 
   let version, user;
 
@@ -22,11 +23,15 @@ addEventListener('DOMContentLoaded', () => {
   $changelogs.addEventListener('click', () => {
     document.location.href = 'pages/changelogs.html';
   });
+
+  $versionsPage.addEventListener('click', () => {
+    document.location.href = 'pages/versions.html';
+  });
   
   $play.addEventListener('click', () => {
     user = $userText.textContent;
     version = $versionText.textContent;
-    if(!version || version === 'Descargar Version' || version === 'Select a Version' || !user) {
+    if(!version || version === 'Select a Version' || !user) {
       alert('Select a version and user');
     } else {
       window.adlauncher.play(user, version);
