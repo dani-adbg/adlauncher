@@ -18,6 +18,7 @@ const appRoot = `${mainRoot}/.adlauncher`;
 let javaRoot = 'C:/Program Files/Java/jdk-17/bin/java';
 let java8Root = 'C:/Program Files/Java/jre-1.8/bin/java';
 let configFile, maxMem, minMem, user, users, versions;
+let isRunning = false;
 
 // CREA EL ARCHIVO DE CONFIGS
 if (!fs.existsSync(path.resolve(appRoot, 'configs', 'settings.json'))) {
@@ -124,7 +125,7 @@ const createWindow = () => {
     webPreferences: {
       contextIsolation: true,
       preload: path.join(__dirname, 'src', 'preload.js'),
-      devTools: false,
+      // devTools: false,
     },
     autoHideMenuBar: true,
     icon: path.join(__dirname, 'src', 'assets', 'icon.png'),
@@ -183,7 +184,12 @@ const createWindow = () => {
       },
     });
 
-    win.minimize();
+    if (isRunning === false) {
+      isRunning = true;
+      launcher.on('debug', (data) => {
+        win.webContents.send('debug', data);
+      });
+    }
   });
 
   ipcMain.on('getSettings', () => {

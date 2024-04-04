@@ -156,6 +156,27 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // GET DATA ABOUT THE GAME
+  const playingContainer = $('.playing-container');
+  const playingText = $('.playing-text');
+  ipcRenderer.on('debug', (_event, data) => {
+    if (data.includes('INICIANDO MINECRAFT')) {
+      playingText.textContent = 'INICIANDO MINECRAFT...';
+    } else if (data.toLowerCase().includes('setting user')) {
+      playingText.textContent = 'INICIANDO USUARIO...';
+    } else if (data.toLowerCase().includes('lwjgl version')) {
+      playingText.textContent = 'MINECRAFT INICIADO';
+      setInterval(() => {
+        playingContainer.classList.add('hidden');
+      }, 3000);
+    } else if (data.includes('Minecraft Crash Report')) {
+      playingContainer.style.background = 'red';
+      setInterval(() => {
+        playingContainer.classList.add('hidden');
+      }, 3000);
+    }
+  });
+
   // ALL FUNCTIONS WITH DOM
   contextBridge.exposeInMainWorld('adlauncher', {
     // ALL

@@ -33,7 +33,10 @@
   justify-content: center;
 }
 
-.version-selector, .version-img, #version-text, #version-selector {
+.version-selector,
+.version-img,
+#version-text,
+#version-selector {
   cursor: pointer;
 }
 
@@ -73,7 +76,7 @@
   width: 15vh;
   cursor: pointer;
   border: none;
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
   font-weight: bold;
   text-transform: uppercase;
@@ -130,7 +133,7 @@
 }
 
 #play:active::before {
-  background-color: #1B5E20;
+  background-color: #1b5e20;
 }
 
 #play:active::after {
@@ -146,4 +149,25 @@
 
 .hidden {
   display: none;
+}
+
+/* PLATING BAR */
+.playing-container {
+  position: absolute;
+  left: 32%;
+  bottom: 6vh;
+  width: 80vh;
+  height: 20px;
+  border: 1px solid #000;
+  margin: 10px auto;
+  border-radius: 5px;
+  background-color: green;
+}
+
+.playing-text {
+  position: absolute;
+  left: 32%;
+  bottom: 0;
+  display: flex;
+  align-items: center;
 }
