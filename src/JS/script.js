@@ -1,18 +1,20 @@
 addEventListener('DOMContentLoaded', () => {
-  const $ = selector => document.querySelector(selector);
-  const $$ = selector => document.querySelectorAll(selector);
 
-  const $play = $('#play');
+  // CONSTANTES - VARIABLES
+  const $ = selector => document.querySelector(selector);
+
+  // BARRA DE OPCIONES
+  const $changelogs = $('#changelogs');
   const $settings = $('#settings');
+  const $versionsPage = $('#versions');
+  const $play = $('#play');
+
   const $versionSelector = $('.version-selector'); 
-  const $versions = $('.versions');
   const $versionsIcon = $('#version-selector');
   const $versionText = $('#version-text');
+  const $versions = $('.versions');
   const $userText = $('#profile-user');
-  const $changelogs = $('#changelogs');
   const $logo = $('#img');
-  const $downloadBar = $('.progress-container hidden');
-  const $versionsPage = $('#versions')
 
   let version, user;
 
@@ -28,6 +30,7 @@ addEventListener('DOMContentLoaded', () => {
     document.location.href = 'pages/versions.html';
   });
   
+  // FUNCION PARA EJECUTAR EL JUEGO CON EL USUARIO Y LA VERSION INDICADA
   $play.addEventListener('click', () => {
     user = $userText.textContent;
     version = $versionText.textContent;
@@ -35,9 +38,10 @@ addEventListener('DOMContentLoaded', () => {
       alert('Select a version and user');
     } else {
       window.adlauncher.play(user, version);
-    }
+    };
   });
   
+  // FUNCION PARA DESPLEGAR LA PESTAÑA DE VERSIONES
   $versionSelector.addEventListener('click', () => {
     window.adlauncher.getVersions();
     $versionsIcon.classList.toggle('rotate');
@@ -45,45 +49,22 @@ addEventListener('DOMContentLoaded', () => {
     $versions.style.overflow = 'auto';
   });
 
-  document.addEventListener('click', () => {
-    if(!$versions.classList.contains('hidden')) {
-      setTimeout(() => {
-        versionpar();
-      }, 10);
+  // FUNCION PARA SELECCIONAR UNA VERSION
+  $versions.addEventListener('click', e => {
+    const element = e.target;
+    if((window.innerHeight - $versions.getBoundingClientRect().bottom) < 38) {
+      $versions.style.bottom = '5vh';
+    };
+    if(element.classList.contains('version')) {
+      version = element.textContent;
+      $versionText.innerText = version;
+      window.adlauncher.getImg(version);
+      $versions.classList.toggle('hidden');
+      $versionsIcon.classList.toggle('rotate');
+      let vImg = Math.floor(version.split('.')[1]);
+      if(!isNaN(vImg) && vImg !== 10 && !version.includes('fabric')) {
+        $logo.src = `assets/minecraft-1.${vImg}.jpg`;
+      };
     };
   });
-
-  function manejarClic() {
-    version = this.textContent;
-    $versionText.innerText = version;
-    window.adlauncher.getImg(version);
-    $versions.classList.toggle('hidden');
-    $versionsIcon.classList.toggle('rotate');
-    this.removeEventListener('click', manejarClic);
-    let vImg = Math.floor(version.split('.')[1]);
-    if(!isNaN(vImg) && vImg !== 10 && !version.includes('fabric')) {
-      $logo.src = `assets/minecraft-1.${vImg}.jpg`;
-    };
-  };
-
-  function plpl() {
-    if($downloadBar.classList.contains('hidden')) {
-      window.adlauncher.input('version');
-      this.removeEventListener('click', plpl);
-    } else {
-      alert('Ya se está descargando una versión...')
-    }
-  }
-
-  function versionpar() {
-    if((window.innerHeight - $versions.getBoundingClientRect().bottom) < 38) {
-      $versions.style.bottom = '5vh'
-    }
-    const $version = $$('.version');
-    const $downloadVersion = $('#download-version');
-    $downloadVersion.addEventListener('click', plpl);
-    $version.forEach(element => {
-      element.addEventListener("click", manejarClic);
-    });
-  }
 });
