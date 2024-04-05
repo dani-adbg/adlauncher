@@ -182,6 +182,8 @@ const createWindow = () => {
         max: maxMem,
         min: minMem,
       },
+      java: javaRoot,
+      java8: java8Root,
     });
 
     if (isRunning === false) {
