@@ -71,21 +71,31 @@ function reloadConfigs() {
 reloadConfigs();
 
 // CHECKJAVA
-function checkJava(javaVersions) {
+function checkJava(javaVersions, win) {
   javaVersions.forEach((javaSpawn) => {
     const java = spawn(javaSpawn, ['-version']);
 
     java.on('error', () => {
+      // CREATE DOWNLOAD JAVA WINDOW
+      const wi = new BrowserWindow({
+        parent: win,
+        height: 200,
+        width: 300,
+        webPreferences: {
+          contextIsolation: true,
+          preload: path.join(__dirname, 'src', 'preload.js'),
+          devTools: false,
+        },
+        autoHideMenuBar: true,
+        icon: path.join(__dirname, 'src', 'assets', 'icon.png'),
+        resizable: false,
+      });
+      wi.loadFile(path.join(__dirname, 'src', 'pages', 'checkJava.html'));
+
       if (javaSpawn.includes('1.8')) {
-        downloadJava(
-          'https://javadl.oracle.com/webapps/download/AutoDL?BundleId=249553_4d245f941845490c91360409ecffb3b4',
-          'java8.exe'
-        );
+        wi.webContents.send('java', '8');
       } else {
-        downloadJava(
-          'https://download.oracle.com/java/17/archive/jdk-17.0.10_windows-x64_bin.exe',
-          'java17.exe'
-        );
+        wi.webContents.send('java', '17');
       }
     });
   });
@@ -114,8 +124,6 @@ async function downloadJava(javaUri, name) {
   }
 }
 
-checkJava([javaRoot, java8Root]);
-
 // ELECTRON
 const createWindow = () => {
   // CREA LA VENTANA
@@ -125,7 +133,7 @@ const createWindow = () => {
     webPreferences: {
       contextIsolation: true,
       preload: path.join(__dirname, 'src', 'preload.js'),
-      // devTools: false,
+      devTools: false,
     },
     autoHideMenuBar: true,
     icon: path.join(__dirname, 'src', 'assets', 'icon.png'),
@@ -133,9 +141,44 @@ const createWindow = () => {
   });
   win.menuBarVisible = false;
 
+  checkJava([javaRoot, java8Root], win);
+
+  ipcMain.on('accept', (event, javaV) => {
+    switch (javaV) {
+      case '8':
+        downloadJava(
+          'https://javadl.oracle.com/webapps/download/AutoDL?BundleId=249553_4d245f941845490c91360409ecffb3b4',
+          'java8.exe'
+        );
+        break;
+
+      case '17':
+        downloadJava(
+          'https://download.oracle.com/java/17/archive/jdk-17.0.10_windows-x64_bin.exe',
+          'java17.exe'
+        );
+        break;
+
+      default:
+        break;
+    }
+  });
+
+  ipcMain.on('cancel', () => {
+    win.close();
+  });
+
   // EVENTOS DEL PROGRAMA
   ipcMain.on('redirect', (event, uri) => {
-    const wi = new BrowserWindow({ parent: win });
+    const wi = new BrowserWindow({
+      parent: win,
+      webPreferences: {
+        contextIsolation: true,
+        devTools: false,
+      },
+      autoHideMenuBar: true,
+      resizable: false,
+    });
     switch (uri) {
       case 'discord':
         wi.loadURL('https://discord.gg/a93w5NpBR9');

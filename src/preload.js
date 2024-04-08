@@ -1,7 +1,22 @@
+// PRELOAD FILE
 window.addEventListener('DOMContentLoaded', () => {
   const { contextBridge, ipcRenderer } = require('electron');
 
   const $ = (selector) => document.querySelector(selector);
+
+  // DOWNLOAD JAVA PAGE
+  ipcRenderer.on('java', (_event, javaVersion) => {
+    $('#java').innerText = javaVersion;
+
+    $('#accept').addEventListener('click', () => {
+      ipcRenderer.send('accept', javaVersion);
+      $('.main').innerText = `DESCARGANDO JAVA ${javaVersion}...`;
+    });
+
+    $('#cancel').addEventListener('click', () => {
+      ipcRenderer.send('cancel');
+    });
+  });
 
   // INDEX PAGE
   // VERSION SELECTOR BOX
@@ -30,12 +45,12 @@ window.addEventListener('DOMContentLoaded', () => {
     $('.version-img').src = thumbnail;
   });
 
-  // USER GET FUNCTION
+  // GET USER FUNCTION
   ipcRenderer.on('sendUser', (_event, user) => {
     $('#profile-user').innerText = user;
   });
 
-  // USERS GET FUNCTIONS
+  // GET USERS FUNCTIONS
   ipcRenderer.on('sendUsers', (_event, users, settings) => {
     let $users = $('.users');
     if (settings === 'settings') {
@@ -57,6 +72,28 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // GET DATA ABOUT THE GAME
+  const playingContainer = $('.playing-container');
+  const playingText = $('.playing-text');
+  ipcRenderer.on('debug', (_event, data) => {
+    if (data.includes('INICIANDO MINECRAFT')) {
+      playingText.textContent = 'INICIANDO MINECRAFT...';
+    } else if (data.toLowerCase().includes('setting user')) {
+      playingText.textContent = 'INICIANDO USUARIO...';
+    } else if (data.toLowerCase().includes('lwjgl version')) {
+      playingText.textContent = 'MINECRAFT INICIADO';
+      setInterval(() => {
+        playingContainer.classList.add('hidden');
+      }, 3000);
+    } else if (data.includes('Minecraft Crash Report')) {
+      playingContainer.style.background = 'red';
+      setInterval(() => {
+        playingContainer.classList.add('hidden');
+      }, 3000);
+    }
+  });
+
+  // SETTINGS PAGE
   // SETTINGS CONSTANTS
   const rootBox = $('.rootbox');
   const minBox = $('#min');
@@ -118,6 +155,7 @@ window.addEventListener('DOMContentLoaded', () => {
     alert('Ajustes guardados correctamente');
   });
 
+  // ALL PAGES
   // DOWNLOAD BAR CONSTANTS
   const $downloadBar = $('.progress-container');
   const $progressText = $('.progress-text');
@@ -144,37 +182,18 @@ window.addEventListener('DOMContentLoaded', () => {
     alert('Version Downloaded');
     location.reload();
   });
+
   // VERSION DOWNLOADING EVENT
   ipcRenderer.on('versionDownloading', (_event) => {
     $downloadBar.classList.toggle('hidden');
   });
+
   // GET ALL AVAILABLE VERSIONS
   ipcRenderer.on('sendVersionsPages', (_event, versions) => {
     const container = $('.versions');
     versions.forEach((version) => {
       container.innerHTML += `<div class='version'>${version.id}</div>`;
     });
-  });
-
-  // GET DATA ABOUT THE GAME
-  const playingContainer = $('.playing-container');
-  const playingText = $('.playing-text');
-  ipcRenderer.on('debug', (_event, data) => {
-    if (data.includes('INICIANDO MINECRAFT')) {
-      playingText.textContent = 'INICIANDO MINECRAFT...';
-    } else if (data.toLowerCase().includes('setting user')) {
-      playingText.textContent = 'INICIANDO USUARIO...';
-    } else if (data.toLowerCase().includes('lwjgl version')) {
-      playingText.textContent = 'MINECRAFT INICIADO';
-      setInterval(() => {
-        playingContainer.classList.add('hidden');
-      }, 3000);
-    } else if (data.includes('Minecraft Crash Report')) {
-      playingContainer.style.background = 'red';
-      setInterval(() => {
-        playingContainer.classList.add('hidden');
-      }, 3000);
-    }
   });
 
   // ALL FUNCTIONS WITH DOM
