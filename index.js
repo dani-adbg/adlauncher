@@ -68,7 +68,6 @@ function reloadConfigs() {
   javaRoot = configFile.javaPath;
   java8Root = configFile.java8Path;
 }
-reloadConfigs();
 
 // CHECKJAVA
 function checkJava(javaVersions, win) {
@@ -141,6 +140,7 @@ const createWindow = () => {
   });
   win.menuBarVisible = false;
 
+  reloadConfigs();
   checkJava([javaRoot, java8Root], win);
 
   ipcMain.on('accept', (event, javaV) => {
