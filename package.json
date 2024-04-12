@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "electron .",
-    "package": "electron-packager ./ --platform=win32 --arch=x64 --icon=src/assets/icon.ico --out=out"
+    "package": "electron-packager ./ --platform=win32 --arch=x64 --icon=src/assets/icon.ico --out=out --overwrite"
   },
   "repository": {
     "type": "git",
